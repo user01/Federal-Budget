@@ -1,0 +1,18 @@
+{
+  "name": "federal-budget",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@bitbucket.org:erik_langenborg/federal-budget.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "csv-parse": "^0.1.1"
+  }
+}
