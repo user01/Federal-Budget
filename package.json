@@ -13,6 +13,8 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "csv-parse": "^0.1.1"
+    "csv-parse": "^0.1.1",
+    "lodash": "^3.9.3",
+    "ramda": "^0.14.0"
   }
 }
