@@ -35,16 +35,16 @@ var toCsvName = function (dataElm) {
   return dataElm.superFunction + '/' + dataElm.normalFunction + '/' + dataElm.subFunction;
 }
 
-var createNodeEntryFromRowBase = R.curry(function (forgeDataSet,row) {
+var createNodeEntryFromRowBase = R.curry(function (forgeDataSet, row) {
   var superFunction = cullDashes(row[0]);
   var normalFunction = cullDashes(row[1]);
   var subFunction = cullDashes(row[2]);
   var dataSet = forgeDataSet(row);
   if (dataSet.length < 2) return false;
   return {
-    superFunction: superFunction,
-    normalFunction: normalFunction,
-    subFunction: subFunction,
+    sp: superFunction,
+    fn: normalFunction,
+    sb: subFunction,
     data: dataSet
   };
 });
@@ -71,38 +71,59 @@ var createElmInYearLine = function (yearNumber, setter) {
     R.prop('data'),
     R.find(R.propEq('year', yearNumber)),
     R.prop('value')
-  );
+    );
   return extract(setter);
-//  return R.prepend(yearNumber, mainValues);
+  //  return R.prepend(yearNumber, mainValues);
 };
 
 var processData = function (json) {
   var sets = createSets(json);
   
   //create header column
-  var headers = R.prepend('date',R.map(toCsvName, sets));
+  var headers = R.prepend('date', R.map(toCsvName, sets));
   console.log(headers);
-  
+
   var years = R.map(R.prop('year'), sets[0].data);
   console.log(years);
-  
+
   var dataLines = R.map(function (thisYear) {
     var createYearLineThis = R.curry(createElmInYearLine)(thisYear);
     var rawLine = R.map(createYearLineThis, sets);
-    return R.prepend(thisYear, rawLine); 
-  },years);
-  console.log(dataLines);
-  
+    return R.prepend(thisYear, rawLine);
+  }, years);
+
   var fullCsv = R.prepend(headers, dataLines);
-  
+
   return fullCsv;
+};
+
+var simplifySet = function (s) {
+  return {
+    sp: s.sp,
+    fn: s.fn,
+    sb: s.sb,
+    data: R.map(R.prop('value'), s.data)
+  };
+};
+
+var richData = function (json) {
+  var sets = createSets(json);
+
+  var years = R.map(R.prop('year'), sets[0].data);
+
+  var newSets = R.map(simplifySet, sets);
+
+  return {
+    years: years,
+    sets: newSets
+  };
 };
 
 csvParse(upperSet, function (err, data) {
   var fixedData = processData(data);
-  var dat = JSON.stringify(fixedData);
-  var csv = csvStringify(fixedData, function (err, output) {
+  csvStringify(fixedData, function (err, output) {
     fs.writeFileSync('./budget.out.csv', output);
   });
-  //fs.writeFileSync('./budget.json', dat);
+  var richDat = richData(data);
+  fs.writeFileSync('./budget.json', JSON.stringify(richDat));
 });
