@@ -1,3 +1,32 @@
+
+/* Graphs Styling */
+.graph-timeline-wrapper {
+  height: 5em;
+}
+#graph-timeline {
+  height: 100%;
+  width: 100%;
+}
+
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #555;
+  shape-rendering: crispEdges;
+}
+
+.axis text {
+  fill: #555;
+}
+
+.line {
+  fill: none;
+  stroke: #ef0d0c;
+  stroke-width: 0.1em;
+}
+
+
+/* Utils */
 .name-title {
   margin-top: 0.5em;
   margin-bottom: 0.2em;
