@@ -14,6 +14,7 @@
   "license": "ISC",
   "devDependencies": {
     "csv-parse": "^0.1.1",
+    "csv-stringify": "0.0.6",
     "lodash": "^3.9.3",
     "ramda": "^0.14.0"
   }
