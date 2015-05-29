@@ -15,6 +15,11 @@
   "devDependencies": {
     "csv-parse": "^0.1.1",
     "csv-stringify": "0.0.6",
+    "grunt": "^0.4.5",
+    "grunt-contrib-uglify": "^0.9.1",
+    "grunt-contrib-watch": "^0.6.1",
+    "grunt-typescript": "^0.6.2",
+    "load-grunt-tasks": "^3.2.0",
     "lodash": "^3.9.3",
     "ramda": "^0.14.0"
   }
