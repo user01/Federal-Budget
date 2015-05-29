@@ -1,7 +1,10 @@
 
 /* Graphs Styling */
 .graph-timeline-wrapper {
-  height: 5em;
+  height: 3em;
+  outline: 1px red solid;
+  padding: 0 1em 0 1em;
+  cursor: default;
 }
 #graph-timeline {
   height: 100%;
@@ -23,6 +26,11 @@
   fill: none;
   stroke: #ef0d0c;
   stroke-width: 0.1em;
+}
+.alive.area {
+  stroke: none;
+  fill: #5DA5DA;
+  fill-opacity: 0.5;
 }
 
 
