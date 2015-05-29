@@ -58,7 +58,6 @@ module Graph {
       var clickHandler = this.handleClick;
       this.d3GraphElement.on("click", function() {
         var p1 = d3.mouse(this);
-        console.log(p1);
         var x = p1[0];
         clickHandler(x);
       });
@@ -78,6 +77,10 @@ module Graph {
       }
       this.rangeCheck();
       this.handleNewYears(null, 0.2);
+      this.runCallback('range', {
+        start: this.rangeStart,
+        end: this.rangeEnd
+      });
     }
 
     private rangeCheck = (): void => {
@@ -105,7 +108,6 @@ module Graph {
     protected collectHeightWidth = (): void => {
       this.width = parseInt(this.d3GraphElement.style("width")) - this.marginPx * 2;
       this.height = parseInt(this.d3GraphElement.style("height")) - this.marginPx * 2;
-      console.log(this.width, this.height);
     }
 
     public handleNewYears = (newData: any, durationFactor: number = 1): void => {
