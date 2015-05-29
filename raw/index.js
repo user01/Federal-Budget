@@ -104,5 +104,5 @@ csvParse(upperSet, function (err, data) {
   var csv = csvStringify(fixedData, function (err, output) {
     fs.writeFileSync('./budget.out.csv', output);
   });
-  fs.writeFileSync('./budget.json', dat);
+  //fs.writeFileSync('./budget.json', dat);
 });
