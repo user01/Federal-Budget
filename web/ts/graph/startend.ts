@@ -1,8 +1,9 @@
 /// <reference path="../../../typings/lodash.d.ts" />
 /// <reference path="../../../typings/d3.d.ts" />
+/// <reference path="../utility/cbbase.ts" />
 
-module Graphs {
-  export class StartEnd {
+module Graph {
+  export class StartEnd extends Utility.CbBase {
     protected d3GraphElement: D3._Selection<any>;
 
     private width: number = 0;
@@ -23,6 +24,7 @@ module Graphs {
     constructor(private id: string,
       private yearStart: number = 1960,
       private yearEnd: number = 2013) {
+      super();
 
       this.rangeStart = Math.floor((this.yearEnd - this.yearStart) / 2 + this.yearStart);
       this.rangeEnd = Math.floor((this.yearEnd - this.yearStart) / 2 + this.yearStart) + 1;
@@ -107,7 +109,7 @@ module Graphs {
         StartEnd.parseYear(this.yearStart + ''),
         StartEnd.parseYear(this.yearEnd + '')
       ]);
-      var tickCount = Math.max(Math.floor((this.width - 20) / 150),1);
+      var tickCount = Math.max(Math.floor((this.width - 20) / 150), 1);
       var xAxis = d3.svg.axis()
         .scale(this.xScale).orient("top")
         .tickPadding(4)
