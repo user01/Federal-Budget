@@ -26,9 +26,7 @@ module Graph {
       private yearEnd: number = 2013) {
       super();
 
-      this.rangeStart = Math.floor((this.yearEnd - this.yearStart) / 2 + this.yearStart);
-      this.rangeEnd = Math.floor((this.yearEnd - this.yearStart) / 2 + this.yearStart) + 1;
-
+      this.rangeCheck();
       this.d3GraphElement = d3.select("#" + this.id);
       this.collectHeightWidth();
 
@@ -78,7 +76,19 @@ module Graph {
         //closer to end
         this.rangeEnd = fullYear;
       }
+      this.rangeCheck();
       this.handleNewYears(null, 0.2);
+    }
+
+    private rangeCheck = (): void => {
+      if (this.rangeStart >= this.rangeEnd) {
+        this.rangeStart = this.rangeEnd - 1;
+      }
+      if (this.rangeStart < this.yearStart || this.rangeStart > this.yearEnd ||
+        this.rangeEnd < this.yearStart || this.rangeEnd > this.yearEnd) {
+        this.rangeStart = Math.floor((this.yearEnd - this.yearStart) / 2 + this.yearStart);
+        this.rangeEnd = Math.floor((this.yearEnd - this.yearStart) / 2 + this.yearStart) + 1;
+      }
     }
 
     protected resize = (): void => {
