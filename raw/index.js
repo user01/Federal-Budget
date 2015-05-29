@@ -32,7 +32,7 @@ var dataSetLengths = R.map(R.pipe(R.prop('data'), arrayLength));
 var cullDashesRegExp = /-*/g;
 var cullDashes = function (str) { return str.replace(cullDashesRegExp, ''); };
 var toCsvName = function (dataElm) {
-  return dataElm.superFunction + '/' + dataElm.normalFunction + '/' + dataElm.subFunction;
+  return dataElm.sp + '/' + dataElm.fn + '/' + dataElm.sb;
 }
 
 var createNodeEntryFromRowBase = R.curry(function (forgeDataSet, row) {
@@ -81,10 +81,10 @@ var processData = function (json) {
   
   //create header column
   var headers = R.prepend('date', R.map(toCsvName, sets));
-  console.log(headers);
+//  console.log(headers);
 
   var years = R.map(R.prop('year'), sets[0].data);
-  console.log(years);
+//  console.log(years);
 
   var dataLines = R.map(function (thisYear) {
     var createYearLineThis = R.curry(createElmInYearLine)(thisYear);
@@ -114,7 +114,9 @@ var richData = function (json) {
   var newSets = R.map(simplifySet, sets);
 
   return {
-    years: years,
+    yearStart: R.min(years),
+    yearEnd: R.max(years),
+    factor: 1000000, //in millions of dollars
     sets: newSets
   };
 };
@@ -125,5 +127,11 @@ csvParse(upperSet, function (err, data) {
     fs.writeFileSync('./budget.out.csv', output);
   });
   var richDat = richData(data);
+  var gdpSet = R.clone(richDat);
+  gdpSet.data = R.prop('data')(R.find(R.pipe(R.prop('sp'), R.eq('GDP')), gdpSet.sets));
+  delete gdpSet.sets;
+  
+  richDat.sets = R.filter(R.pipe(R.prop('sp'), R.eq('GDP'), R.not), richDat.sets);// screen out gdp
+  fs.writeFileSync('./gdp.json', JSON.stringify(gdpSet));
   fs.writeFileSync('./budget.json', JSON.stringify(richDat));
 });
