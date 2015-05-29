@@ -7,12 +7,12 @@ module Graphs {
 
     protected width: number = 0;
     protected height: number = 0;
-    protected marginPx: number = 38;
+    protected marginPx: number = 8;
 
     private graphSvg: D3._Selection<any>;
     private xScale: D3.Scale.TimeScale;
-    
-    private static parseYear:(src:string)=>Date = d3.time.format("%Y").parse;
+
+    private static parseYear: (src: string) => Date = d3.time.format("%Y").parse;
 
     constructor(private id: string,
       private yearStart: number = 1960,
@@ -41,9 +41,9 @@ module Graphs {
 
     protected resize = (): void => {
       this.collectHeightWidth();
-      
+
       this.xScale.range([0, this.width]).nice();
-      
+
       this.graphSvg
         .attr("width", this.width + this.marginPx * 2)
         .attr("height", this.height + this.marginPx * 2)
@@ -64,8 +64,8 @@ module Graphs {
       var durationMs = 250 * durationFactor;
 
       this.xScale.domain([
-        StartEnd.parseYear(this.yearStart+''),
-        StartEnd.parseYear(this.yearEnd+'')
+        StartEnd.parseYear(this.yearStart + ''),
+        StartEnd.parseYear(this.yearEnd + '')
       ]);
       var xAxis = d3.svg.axis()
         .scale(this.xScale).orient("top")
@@ -75,7 +75,9 @@ module Graphs {
         this.graphSvg.append("g")
           .attr("class", "x axis")
           .attr("transform", "translate(0," + this.height + ")")
-          .call(xAxis);
+          .call(xAxis)
+          .selectAll("text")
+          .style("text-anchor", "start");
       } else {
         this.graphSvg.selectAll(".x.axis").transition().duration(durationMs)
           .attr("transform", "translate(0," + this.height + ")")
