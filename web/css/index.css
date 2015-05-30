@@ -1,8 +1,19 @@
 
 /* Graphs Styling */
+.graph-wrapper {
+  height: 40vh;
+  outline: 1px red solid;
+  padding: 0.2em 1em;
+  cursor: default;
+}
+#graph-main {
+  height: 100%;
+  width: 100%;
+}
+
 .graph-timeline-wrapper {
   height: 3em;
-  outline: 1px red solid;
+  outline: 1px blue solid;
   padding: 0 1em 0 1em;
   cursor: default;
 }
@@ -10,6 +21,8 @@
   height: 100%;
   width: 100%;
 }
+
+/* SVG status */
 
 .axis path,
 .axis line {
@@ -32,7 +45,10 @@
   fill: #5DA5DA;
   fill-opacity: 0.5;
 }
-
+rect.backdrop {
+  fill: teal;
+  pointer-events: all;
+}
 
 /* Utils */
 .name-title {
