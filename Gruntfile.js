@@ -1,7 +1,7 @@
 
 var typescriptPureOptions = {
   module: 'commonjs', //or commonjs
-  target: 'es3', //or es3
+  target: 'es5', //or es3
   sourceMap: true,
   comments: false,               // same as !removeComments. [true | false (default)]
   declaration: false
