@@ -1,6 +1,8 @@
 /// <reference path="graph/startend.ts" />
 
 
+declare var R:any;
+
 console.log('System online');
 
 
