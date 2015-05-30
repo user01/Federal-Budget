@@ -67,7 +67,7 @@ module Utility {
       });
     }
 
-    private createPatchedData = (): void => {
+    protected createPatchedData = (): void => {
       var tempData = this._data; //prevents hammering .parse 
       this._yearStart = tempData.yearStart;
       this._yearEnd = tempData.yearEnd;
