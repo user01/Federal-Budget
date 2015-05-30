@@ -6,6 +6,10 @@ module Utility {
     private static staleSeconds: number = 259200;
     private static prefix: string = "DataSet_";
 
+    private _ready: boolean = false;
+    public get Ready(): boolean {
+      return this._ready;
+    }
     private _yearStart: number = 0;
     public get YearStart(): number {
       return this._yearStart;
@@ -66,6 +70,7 @@ module Utility {
       this._yearStart = tempData.yearStart;
       this._yearEnd = tempData.yearEnd;
       this._dataSet = tempData.data;
+      this._ready = true;
 
       this.runCallback('data', this);
     }
