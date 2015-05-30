@@ -117,7 +117,7 @@ var richData = function (json) {
     yearStart: R.min(years),
     yearEnd: R.max(years),
     factor: 1000000, //in millions of dollars
-    sets: newSets
+    data: newSets
   };
 };
 
