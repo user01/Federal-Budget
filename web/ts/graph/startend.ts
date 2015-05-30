@@ -114,6 +114,7 @@ module Graph {
       if (newData) {
         this.yearStart = newData.yearStart;
         this.yearEnd = newData.yearEnd;
+        this.rangeCheck();
       }
       var durationMs = 250 * durationFactor;
 
