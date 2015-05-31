@@ -96,7 +96,6 @@ module Graph {
 
     protected resize = (): void => {
       this.collectHeightWidth();
-      console.log(this.width, this.height);
 
       this.xScale.range([0, this.width]).nice();
 
