@@ -8,20 +8,24 @@ module Utility {
     private static staleSeconds: number = 259200;
     private static prefix: string = "DataSet_";
 
-    private _ready: boolean = false;
+    protected _ready: boolean = false;
     public get Ready(): boolean {
       return this._ready;
     }
-    private _yearStart: number = 0;
+    protected _yearStart: number = 0;
     public get YearStart(): number {
       return this._yearStart;
     }
-    private _yearEnd: number = 0;
+    protected _yearEnd: number = 0;
     public get YearEnd(): number {
       return this._yearEnd;
     }
-    private _dataSet: Array<number> = [];
-    public get DataSet(): Array<number> {
+    protected _factor: number = 1;
+    public get Factor(): number {
+      return this._factor;
+    }
+    protected _dataSet: Array<any> = [];
+    public get DataSet(): Array<any> {
       return this._dataSet;
     }
 
@@ -32,10 +36,10 @@ module Utility {
       return DataSet.prefix + this.path + '_Data';
     }
 
-    private get _data(): any {
+    protected get _data(): any {
       return JSON.parse(localStorage[this.pullDataId]);
     }
-    private set _data(value: any) {
+    protected set _data(value: any) {
       localStorage[this.pullDataId] = JSON.stringify(value);
     }
     private get timestamp(): number {
@@ -67,12 +71,13 @@ module Utility {
       });
     }
 
+    //this class level assumes data is all numbers
     protected createPatchedData = (): void => {
       var tempData = this._data; //prevents hammering .parse 
       this._yearStart = tempData.yearStart;
       this._yearEnd = tempData.yearEnd;
-      var factor = R.is(Number, tempData.factor) ? tempData.factor: 1;
-      this._dataSet = R.map(R.multiply(factor),tempData.data);
+      this._factor = R.is(Number, tempData.factor) ? tempData.factor: 1;
+      this._dataSet = R.map(R.multiply(this._factor),tempData.data); //provides a clone as well
       this._ready = true;
 
       this.runCallback('data', this);
