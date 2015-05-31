@@ -128,10 +128,10 @@ csvParse(upperSet, function (err, data) {
   });
   var richDat = richData(data);
   var gdpSet = R.clone(richDat);
-  gdpSet.data = R.prop('data')(R.find(R.pipe(R.prop('sp'), R.eq('GDP')), gdpSet.sets));
+  gdpSet.data = R.prop('data')(R.find(R.pipe(R.prop('sp'), R.eq('GDP')), gdpSet.data));
   delete gdpSet.sets;
   
-  richDat.sets = R.filter(R.pipe(R.prop('sp'), R.eq('GDP'), R.not), richDat.sets);// screen out gdp
+  richDat.sets = R.filter(R.pipe(R.prop('sp'), R.eq('GDP'), R.not), richDat.data);// screen out gdp
   fs.writeFileSync('./gdp.json', JSON.stringify(gdpSet));
   fs.writeFileSync('./budget.json', JSON.stringify(richDat));
 });
