@@ -31,7 +31,7 @@ module Utility {
     
     private dataLoaded = (): void => {
       if (!DataAll.allReadySets(R.values(this.sets))) return;
-      console.log('All ready!', this.sets);
+      this.runCallback('data', this.sets);
     }
   }
 }
