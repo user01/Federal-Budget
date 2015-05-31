@@ -1,6 +1,8 @@
 /// <reference path="../../../typings/lodash.d.ts" />
 /// <reference path="../../../typings/d3.d.ts" />
 /// <reference path="../utility/cbbase.ts" />
+/// <reference path="../utility/data.all.ts" />
+
 
 module Graph {
   export class Spending extends Utility.CbBase {
@@ -15,7 +17,7 @@ module Graph {
     private force: D3.Layout.ForceLayout;
     private color: D3.Scale.LinearScale;
 
-    constructor(private id: string) {
+    constructor(private id: string, private data: Utility.DataSet) {
       super();
 
       this.d3GraphElement = d3.select("#" + this.id);
@@ -31,7 +33,7 @@ module Graph {
       this.force = d3.layout.force()
         .gravity(0)
         .charge(12)
-//        .friction(-3)
+      //        .friction(-3)
         .size([this.width, this.height]);
 
       this.nodes = this.force.nodes();
