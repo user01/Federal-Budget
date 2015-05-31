@@ -21,10 +21,10 @@ module Graph {
 
 
 
-//      var color = d3.scale.linear()
-//        .domain([h - 100, 100])
-//        .range(["hsl(180,100%,10%)", "hsl(210,100%,90%)"])
-//        .interpolate(d3.interpolateHsl);
+      var color = d3.scale.linear()
+        .domain([this.height - 100, 100])
+        .range(["hsl(180,100%,10%)", "hsl(210,100%,90%)"])
+        .interpolate(d3.interpolateHsl);
 
       var force = d3.layout.force()
         .gravity(0)
@@ -50,40 +50,42 @@ module Graph {
           .attr("cy", function(d) { return d.y; });
       });
 
-      var p0;
+      var p0,height = this.height;
 
       this.d3GraphElement.on("mousemove", function() {
         var p1 = d3.mouse(this);
-//        console.log(p1);
+        //console.log(a,p1);
 
 //        var node = {
 //          x: p1[0],
 //          y: p1[1],
 //          px: (p0 || (p0 = p1))[0],
 //          py: p0[1],
-//          cy: Math.random() * (h - 200) + 100
+//          cy: Math.random() * (height - 200) + 100
 //        };
-
-        p0 = p1;
-
-        //        this.d3GraphElement.append("svg:circle")
-        //          .data([node])
-        //          .attr("cx", function(d) { return d.x; })
-        //          .attr("cy", function(d) { return d.y; })
-        //          .attr("r", 15)
-        //          .style("fill", function(d) { return color(d.cy); })
-        //          .transition()
-        //          .delay(3000)
-        //          .attr("r", 1e-6)
-        //          .each("end", function() { nodes.shift(); })
-        //          .remove();
-
+//
+//        p0 = p1;
+//
+//                this.d3GraphElement.append("svg:circle")
+//                  .data([node])
+//                  .attr("cx", function(d) { return d.x; })
+//                  .attr("cy", function(d) { return d.y; })
+//                  .attr("r", 15)
+//                  .style("fill", function(d) { return color(d.cy); })
+//                  .transition()
+//                  .delay(3000)
+//                  .attr("r", 1e-6)
+//                  .each("end", function() { nodes.shift(); })
+//                  .remove();
+//
 //        nodes.push(node);
 //        force.start();
       });
 
 
 
+      d3.select(window).on('resize.'+this.id, this.resize);
+      this.resize();
 
     }
     
@@ -94,10 +96,9 @@ module Graph {
 //        .attr("width", this.width + this.marginPx * 2)
 //        .attr("height", this.height + this.marginPx * 2)
       //this.handleNewYears(null, 0);
-      
-      
-      this.backdrop.attr("width", this.width/2)
-        .attr("height", this.height/2);
+//      console.log(this.width, this.height);
+      this.backdrop.attr("width", this.width)
+        .attr("height", this.height);
     }
 
     

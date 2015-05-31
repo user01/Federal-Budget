@@ -52,7 +52,7 @@ module Graph {
         .attr("class", "area alive");
 
       //debounce this
-      d3.select(window).on('resize', this.resize);
+      d3.select(window).on('resize.'+this.id, this.resize);
       this.resize();
 
       var clickHandler = this.handleClick;
@@ -96,6 +96,7 @@ module Graph {
 
     protected resize = (): void => {
       this.collectHeightWidth();
+      console.log(this.width, this.height);
 
       this.xScale.range([0, this.width]).nice();
 
