@@ -10,7 +10,6 @@ module Graph {
 
     private width: number = 0;
     private height: number = 0;
-    private marginPx: number = 8;
     private backdrop: D3._Selection<any>;
     private nodes: D3.Layout.GraphNodeForce[];
     private force: D3.Layout.ForceLayout;
@@ -31,7 +30,8 @@ module Graph {
 
       this.force = d3.layout.force()
         .gravity(0)
-        .charge(0)
+        .charge(12)
+//        .friction(-3)
         .size([this.width, this.height]);
 
       this.nodes = this.force.nodes();
@@ -102,14 +102,12 @@ module Graph {
       };
     }
     private mouseEvent = (pt: number[]) => {
-
+      var cy = Math.random() * (this.height - 200) + 100;
       var node = {
         x: pt[0],
-        y: pt[1],
-        px: pt[0],
-        py: pt[1],
+        y: cy,
         radius: Math.random() * 15 + 5,
-        cy: Math.random() * (this.height - 200) + 100
+        cy: cy
       };
 
 
@@ -143,8 +141,8 @@ module Graph {
 
 
     protected collectHeightWidth = (): void => {
-      this.width = parseInt(this.d3GraphElement.style("width")) - this.marginPx * 2;
-      this.height = parseInt(this.d3GraphElement.style("height")) - this.marginPx * 2;
+      this.width = parseInt(this.d3GraphElement.style("width"));
+      this.height = parseInt(this.d3GraphElement.style("height"));
     }
 
   }
