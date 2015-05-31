@@ -108,7 +108,7 @@ module Graph {
         y: pt[1],
         px: pt[0],
         py: pt[1],
-        radius: 10,
+        radius: Math.random() * 15 + 5,
         cy: Math.random() * (this.height - 200) + 100
       };
 
