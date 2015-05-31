@@ -3330,6 +3330,7 @@ declare module D3 {
             /**
             * Constructs a new quadtree for the specified array of points.
             */
+            quadtree(nodes: any[]): Quadtree;
             quadtree(points: Point[], x1: number, y1: number, x2: number, y2: number): Quadtree;
             /**
             * Constructs a new quadtree for the specified array of points.

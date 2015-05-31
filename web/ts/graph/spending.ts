@@ -14,6 +14,7 @@ module Graph {
     private backdrop: D3._Selection<any>;
     private nodes: D3.Layout.GraphNodeForce[];
     private force: D3.Layout.ForceLayout;
+    private color: D3.Scale.LinearScale;
 
     constructor(private id: string) {
       super();
@@ -23,7 +24,7 @@ module Graph {
 
 
 
-      var color = d3.scale.linear()
+      this.color = d3.scale.linear()
         .domain([this.height - 100, 100])
         .range(["hsl(180,100%,10%)", "hsl(210,100%,90%)"])
         .interpolate(d3.interpolateHsl);
@@ -41,11 +42,20 @@ module Graph {
         .attr("width", this.width)
         .attr("height", this.height);
 
-      this.force.on("tick", (e:any) => {
-          var k = e.alpha * .1;
-          this.nodes.forEach((node:any) => {
-            node.y += (node.cy - node.y) * k;
-          });
+      this.force.on("tick", (e: any) => {
+        var k = e.alpha * .1;
+        this.nodes.forEach((node: any) => {
+          node.y += (node.cy - node.y) * k;
+        });
+
+        var q = d3.geom.quadtree(this.nodes),
+          i = 0,
+          n = this.nodes.length;
+
+        while (++i < n) {
+          q.visit(Spending.collide(this.nodes[i]));
+        }
+
 
         this.d3GraphElement.selectAll("circle")
           .attr("cx", function(d) { return d.x; })
@@ -65,7 +75,32 @@ module Graph {
       this.resize();
 
     }
-
+    private static collide = (node) => {
+      var r = node.radius + 16,
+        nx1 = node.x - r,
+        nx2 = node.x + r,
+        ny1 = node.y - r,
+        ny2 = node.y + r;
+      return function(quad, x1, y1, x2, y2) {
+        if (quad.point && (quad.point !== node)) {
+          var x = node.x - quad.point.x,
+            y = node.y - quad.point.y,
+            l = Math.sqrt(x * x + y * y),
+            r = node.radius + quad.point.radius;
+          if (l < r) {
+            l = (l - r) / l * .5;
+            node.x -= x *= l;
+            node.y -= y *= l;
+            quad.point.x += x;
+            quad.point.y += y;
+          }
+        }
+        return x1 > nx2
+          || x2 < nx1
+          || y1 > ny2
+          || y2 < ny1;
+      };
+    }
     private mouseEvent = (pt: number[]) => {
 
       var node = {
@@ -73,6 +108,7 @@ module Graph {
         y: pt[1],
         px: pt[0],
         py: pt[1],
+        radius: 10,
         cy: Math.random() * (this.height - 200) + 100
       };
 
@@ -81,8 +117,8 @@ module Graph {
         .data([node])
         .attr("cx", function(d) { return d.x; })
         .attr("cy", function(d) { return d.y; })
-        .attr("r", 15)
-//        .style("fill", function(d) { return color(d.cy); })
+        .attr("r", (d) => { return d.radius; })
+        .style("fill", (d) => { return this.color(d.cy); })
         .transition()
         .delay(3000)
         .attr("r", 1e-6)
