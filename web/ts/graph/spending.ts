@@ -54,11 +54,14 @@ module Graph {
 
     private _valueMaxRaw: number = 0;
     private _valueMaxGdp: number = 0;
+    private _superfunctions: Array<string> = Spending.pluckUniqueSuperFunctions(this.data.budget.DataSet);
+    private _functions: Array<string> = Spending.pluckUniqueFunctions(this.data.budget.DataSet);
 
     constructor(private id: string, private data: Utility.DataSets) {
       super();
       this._yearTo = this.data.budget.YearEnd;
       this._yearFrom = this.data.budget.YearStart;
+      
       
       
       // compute max values for all modes
@@ -254,6 +257,14 @@ module Graph {
     private static key = (d): string => {
       return d.sp + '-' + d.fn + '-' + d.sb;
     }
+    
+    private static pluckUniqueSuperFunctions = (dats: any[]): string[]=> {
+      return R.pipe(R.pluck('sp'), R.uniq)(dats);
+    }
+    private static pluckUniqueFunctions = (dats: any[]): string[]=> {
+      return R.pipe(R.pluck('fn'), R.uniq)(dats);
+    }
+    
 
     private static addKeysForD3 = (obj: any, idx: number): any => {
       obj.x = 3 * idx;
