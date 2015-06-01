@@ -125,9 +125,9 @@ module Graph {
         .attr("class", "dot")
         .style("fill", 'red')
         .style('stroke','black')
-        .attr("r", (d) => { return Math.max(0,this.radius(d)-1); })
-        .attr("cx", (d) => { return d.x; })
-        .attr("cy", (d) => { return d.y; })
+//        .attr("r", (d) => { return Math.max(0,this.radius(d)-1); })
+//        .attr("cx", (d) => { return d.x; })
+//        .attr("cy", (d) => { return d.y; })
         .on('mouseover', (d) => { console.log(d); })
       //      .style("fill", function(d) { return colorScale(color(d)); })
       //      .call(position)
@@ -136,17 +136,34 @@ module Graph {
 
       d3.select(window).on('resize.' + this.id, this.resize);
       this.resize();
-      this.force.start();
     }
 
 
     protected resize = (): void => {
       this.collectHeightWidth();
-
       this.backdrop.attr("width", this.width)
         .attr("height", this.height);
+      
+      
+      var radiusForAll = d3.min([this.width, this.height]);
+      this.radiusRawScale.range([0, radiusForAll]); //reset ranges
+      
+      this.renderNewState();
     }
 
+
+    private renderNewState = (): void => {
+      
+      var dots = this.d3GraphElement
+        .selectAll(".dot")
+        .data(this.data.budget.DataSet, Spending.key)
+        .transition().duration(250)
+        .attr("r", (d) => { return Math.max(0,this.radius(d)-1); })
+        .attr("cx", (d) => { return d.x; })
+        .attr("cy", (d) => { return d.y; })
+      
+      this.force.start();
+    }
 
     protected collectHeightWidth = (): void => {
       this.width = parseInt(this.d3GraphElement.style("width"));
