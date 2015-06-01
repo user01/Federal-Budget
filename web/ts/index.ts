@@ -12,10 +12,16 @@ console.log('System online');
 var startend = new Graph.StartEnd('graph-timeline');
 startend.on('range', (newRange): void=> { console.log(newRange); });
 
-var spending;
+var spending:Graph.Spending;
 var dataAll = new Utility.DataAll('data');
 dataAll.on('data', (data: Utility.DataSets): void=> {
   console.log('data!', data);
-  spending = new Graph.Spending('graph-main',data);
+  spending = new Graph.Spending('graph-main', data);
+  startend.on('range', (newRange): void=> {
+    spending.YearTo = newRange.end;
+    spending.YearFrom = newRange.start;
+    spending.RenderNewState();
+  });
+  
 });
 dataAll.Initialize();

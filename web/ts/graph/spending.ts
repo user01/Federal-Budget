@@ -151,11 +151,11 @@ module Graph {
       var radiusForAll = d3.min([this.width, this.height]);
       this.radiusRawScale.range([0, radiusForAll]); //reset ranges
       
-      this.renderNewState();
+      this.RenderNewState();
     }
 
 
-    private renderNewState = (): void => {
+    public RenderNewState = (): void => {
 
       var dots = this.d3GraphElement
         .selectAll(".dot")
