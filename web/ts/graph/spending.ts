@@ -69,14 +69,14 @@ module Graph {
       this.collectHeightWidth();
 
 
-      var radiusForAll = d3.min([this.width, this.height]) / 2;
+      var radiusForAll = d3.min([this.width, this.height]);
       this.radiusRawScale = d3.scale.linear()
-        .domain([0, this._valueMaxRaw])
+        .domain([1e-6, this._valueMaxRaw])
         .range([0, radiusForAll]);
 
       this.color = d3.scale.linear()
         .domain([this.height - 100, 100])
-        .range(["hsl(180,100%,10%)", "hsl(210,100%,90%)"])
+        .range(["hsl(126, 100%, 24%)", "hsl(2, 100%, 24%)"]) //green to red
         .interpolate(d3.interpolateHsl);
 
       this.force = d3.layout.force()
@@ -124,9 +124,11 @@ module Graph {
         .enter().append("circle")
         .attr("class", "dot")
         .style("fill", 'red')
-        .attr("r", (d) => { return this.radius(d); })
+        .style('stroke','black')
+        .attr("r", (d) => { return Math.max(0,this.radius(d)-1); })
         .attr("cx", (d) => { return d.x; })
         .attr("cy", (d) => { return d.y; })
+        .on('mouseover', (d) => { console.log(d); })
       //      .style("fill", function(d) { return colorScale(color(d)); })
       //      .call(position)
       //      .sort(order);
@@ -161,7 +163,7 @@ module Graph {
     // Dot computaion functions
     // *******************************************************************
     private radius = (d: any): number => {
-      var value = d.data[this.yearToIndex(this.YearTo)];
+      var value = Math.max(1e-5,d.data[this.yearToIndex(this.YearTo)]);
       var rad = 10;
       switch (this._mode) {
         case SpendingMode.Raw:
