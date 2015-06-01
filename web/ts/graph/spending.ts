@@ -66,7 +66,6 @@ module Graph {
       //        .friction(-3)
         .size([this.width, this.height]);
 
-      this.nodes = this.force.nodes();
 
 
       this.backdrop = this.d3GraphElement.append("svg:rect")
@@ -88,13 +87,16 @@ module Graph {
           q.visit(Spending.collide(this.nodes[i]));
         }
 
-
-        this.d3GraphElement.selectAll("circle")
+        this.d3GraphElement.selectAll(".dot")
           .attr("cx", function(d) { return d.x; })
           .attr("cy", function(d) { return d.y; });
       });
 
-
+      this.data.budget.DataSet = R.mapIndexed(Spending.addKeysForD3)(this.data.budget.DataSet);
+      
+      this.force.nodes(this.data.budget.DataSet);
+      this.nodes = this.force.nodes();
+      
       var dot = this.d3GraphElement.append("g")
         .attr("class", "dots")
         .selectAll(".dot")
@@ -103,53 +105,53 @@ module Graph {
         .enter().append("circle")
         .attr("class", "dot")
         .style("fill", 'red')
-        .attr("r", (d) => { return 25; })
-        .attr("cx", this.width / 2)
-        .attr("cy", this.height / 2)
+        .attr("r", (d) => { return d.radius; })
+        .attr("cx", (d) => { return d.x; })
+        .attr("cy", (d) => { return d.y; })
       //      .style("fill", function(d) { return colorScale(color(d)); })
       //      .call(position)
       //      .sort(order);
 
-      
-      var p0, height = this.height;
-      var evtFn = this.mouseEvent;
-
-      this.d3GraphElement.on("mousemove", function() {
-        var p1 = d3.mouse(this);
-        evtFn(p1);
-      });
+//      
+//      var p0, height = this.height;
+//      var evtFn = this.mouseEvent;
+//
+//      this.d3GraphElement.on("mousemove", function() {
+//        var p1 = d3.mouse(this);
+//        evtFn(p1);
+//      });
 
 
       d3.select(window).on('resize.' + this.id, this.resize);
       this.resize();
-
-    }
-    
-    private mouseEvent = (pt: number[]) => {
-      var cy = Math.random() * (this.height - 200) + 100;
-      var node = {
-        x: pt[0],
-        y: cy,
-        radius: Math.random() * 15 + 5,
-        cy: cy
-      };
-
-
-      this.d3GraphElement.append("svg:circle")
-        .data([node])
-        .attr("cx", function(d) { return d.x; })
-        .attr("cy", function(d) { return d.y; })
-        .attr("r", (d) => { return d.radius; })
-        .style("fill", (d) => { return this.color(d.cy); })
-        .transition()
-        .delay(3000)
-        .attr("r", 1e-6)
-        .each("end", () => { this.nodes.shift(); })
-        .remove();
-
-      this.nodes.push(node);
       this.force.start();
     }
+    
+//    private mouseEvent = (pt: number[]) => {
+//      var cy = Math.random() * (this.height - 200) + 100;
+//      var node = {
+//        x: pt[0],
+//        y: cy,
+//        radius: Math.random() * 15 + 5,
+//        cy: cy
+//      };
+//
+//
+//      this.d3GraphElement.append("svg:circle")
+//        .data([node])
+//        .attr("cx", function(d) { return d.x; })
+//        .attr("cy", function(d) { return d.y; })
+//        .attr("r", (d) => { return d.radius; })
+//        .style("fill", (d) => { return this.color(d.cy); })
+//        .transition()
+//        .delay(3000)
+//        .attr("r", 1e-6)
+//        .each("end", () => { this.nodes.shift(); })
+//        .remove();
+//
+//      this.nodes.push(node);
+//      this.force.start();
+//    }
 
     protected resize = (): void => {
       this.collectHeightWidth();
@@ -198,6 +200,14 @@ module Graph {
       return d.sp + '-' + d.fn + '-' + d.sb;
     }
     
+    private static addKeysForD3 = (obj: any, idx:number): any => {
+      obj.x = 3 * idx;
+      obj.y = 3*idx;
+      obj.cy = 200;
+      obj.cx = 0;
+      obj.radius = 4;
+      return obj;
+    }
     
     private static collide = (node) => {
       var r = node.radius + 16,
