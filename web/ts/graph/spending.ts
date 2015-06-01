@@ -17,13 +17,14 @@ module Graph {
     private nodes: D3.Layout.GraphNodeForce[];
     private force: D3.Layout.ForceLayout;
     private color: D3.Scale.LinearScale;
+    private radiusRawScale: D3.Scale.LogScale;
 
     private _yearTo: number = 0;
     public get YearTo(): number {
       return this._yearTo;
     }
-    public set YearTo(year:number) {
-      this._yearTo = Math.min(Math.max(this.data.budget.YearStart + 1, year),this.data.budget.YearEnd);
+    public set YearTo(year: number) {
+      this._yearTo = Math.min(Math.max(this.data.budget.YearStart + 1, year), this.data.budget.YearEnd);
       if (this._yearTo <= this._yearFrom) {
         this._yearFrom = this._yearTo - 1;
       }
@@ -32,8 +33,8 @@ module Graph {
     public get YearFrom(): number {
       return this._yearFrom;
     }
-    public set YearFrom(year:number) {
-      this._yearFrom = Math.min(Math.max(this.data.budget.YearStart, year),this.data.budget.YearEnd - 1);
+    public set YearFrom(year: number) {
+      this._yearFrom = Math.min(Math.max(this.data.budget.YearStart, year), this.data.budget.YearEnd - 1);
       if (this._yearTo <= this._yearFrom) {
         this._yearTo = this._yearFrom + 1;
       }
@@ -44,13 +45,13 @@ module Graph {
       this._mode = mode;
       //perform recomputes
     }
-    public get Mode():SpendingMode {
+    public get Mode(): SpendingMode {
       return this._mode;
     }
     private get CpiFactorToCurrentYear(): number {
       return this.cpiFactor(this.YearTo);
     }
-    
+
     private _valueMaxRaw: number = 0;
     private _valueMaxGdp: number = 0;
 
@@ -61,13 +62,17 @@ module Graph {
       
       
       // compute max values for all modes
-//      this.valueMaxGdp = R.max(R.map(this.data.budget.DataSet))
+      //      this.valueMaxGdp = R.max(R.map(this.data.budget.DataSet))
       this.maxvalueRawCompute();
 
       this.d3GraphElement = d3.select("#" + this.id);
       this.collectHeightWidth();
 
 
+      var radiusForAll = d3.min([this.width, this.height]) / 2;
+      this.radiusRawScale = d3.scale.linear()
+        .domain([0, this._valueMaxRaw])
+        .range([0, radiusForAll]);
 
       this.color = d3.scale.linear()
         .domain([this.height - 100, 100])
@@ -75,9 +80,9 @@ module Graph {
         .interpolate(d3.interpolateHsl);
 
       this.force = d3.layout.force()
-        .gravity(0)
+        .gravity(3)
         .charge(12)
-      //        .friction(-3)
+        .friction(0.06)
         .size([this.width, this.height]);
 
 
@@ -107,74 +112,35 @@ module Graph {
       });
 
       this.data.budget.DataSet = R.mapIndexed(Spending.addKeysForD3)(this.data.budget.DataSet);
-      
+
       this.force.nodes(this.data.budget.DataSet);
       this.nodes = this.force.nodes();
-      
+
       var dot = this.d3GraphElement.append("g")
         .attr("class", "dots")
         .selectAll(".dot")
       //      .data(interpolateData(1800))
-        .data(data.budget.DataSet,Spending.key)
+        .data(data.budget.DataSet, Spending.key)
         .enter().append("circle")
         .attr("class", "dot")
         .style("fill", 'red')
-        .attr("r", (d) => { return d.radius; })
+        .attr("r", (d) => { return this.radius(d); })
         .attr("cx", (d) => { return d.x; })
         .attr("cy", (d) => { return d.y; })
       //      .style("fill", function(d) { return colorScale(color(d)); })
       //      .call(position)
       //      .sort(order);
 
-//      
-//      var p0, height = this.height;
-//      var evtFn = this.mouseEvent;
-//
-//      this.d3GraphElement.on("mousemove", function() {
-//        var p1 = d3.mouse(this);
-//        evtFn(p1);
-//      });
-
 
       d3.select(window).on('resize.' + this.id, this.resize);
       this.resize();
       this.force.start();
     }
-    
-//    private mouseEvent = (pt: number[]) => {
-//      var cy = Math.random() * (this.height - 200) + 100;
-//      var node = {
-//        x: pt[0],
-//        y: cy,
-//        radius: Math.random() * 15 + 5,
-//        cy: cy
-//      };
-//
-//
-//      this.d3GraphElement.append("svg:circle")
-//        .data([node])
-//        .attr("cx", function(d) { return d.x; })
-//        .attr("cy", function(d) { return d.y; })
-//        .attr("r", (d) => { return d.radius; })
-//        .style("fill", (d) => { return this.color(d.cy); })
-//        .transition()
-//        .delay(3000)
-//        .attr("r", 1e-6)
-//        .each("end", () => { this.nodes.shift(); })
-//        .remove();
-//
-//      this.nodes.push(node);
-//      this.force.start();
-//    }
+
 
     protected resize = (): void => {
       this.collectHeightWidth();
 
-      //      this.graphSvg
-      //        .attr("width", this.width + this.marginPx * 2)
-      //        .attr("height", this.height + this.marginPx * 2)
-      //this.handleNewYears(null, 0);
-      //      console.log(this.width, this.height);
       this.backdrop.attr("width", this.width)
         .attr("height", this.height);
     }
@@ -183,7 +149,7 @@ module Graph {
     protected collectHeightWidth = (): void => {
       this.width = parseInt(this.d3GraphElement.style("width"));
       this.height = parseInt(this.d3GraphElement.style("height"));
-      
+
       var minDim = Math.min(this.width, this.height);
       var availableArea = Math.PI * Math.pow((minDim / 2), 2);
       //find the maxed sum of the current mode
@@ -196,29 +162,32 @@ module Graph {
     // *******************************************************************
     private radius = (d: any): number => {
       var value = d.data[this.yearToIndex(this.YearTo)];
+      var rad = 10;
       switch (this._mode) {
         case SpendingMode.Raw:
-          return value;
+          rad = Math.max(0, this.radiusRawScale(value));
+          break;
       }
-      return value;
+      d.radius = rad;
+      return d.radius;
     }
-    
+
     private value = (d: any): number => {
       return 7;
     }
-    
+
     private yearToIndex = (year: number): number => {
-      return Math.max(0,Math.floor(year) - this.data.budget.YearStart);
+      return Math.max(0, Math.floor(year) - this.data.budget.YearStart);
     }
-    
+
     private maxvalueRawCompute = (): number => {
       var yearRange = R.range(this.data.budget.YearStart, this.data.budget.YearEnd + 1);
       //compute the total for every year
       var valuesArrays = R.pluck('data')(this.data.budget.DataSet);
-      console.log(valuesArrays);
+      //console.log(valuesArrays);
       
       var valueAtYearIndex = R.pipe(this.yearToIndex, R.nth);
-      
+
       var values = R.map((year: number): Array<number> => {
         var inx = this.yearToIndex(year);
         var valueAtThisIndex = valueAtYearIndex(year);
@@ -236,7 +205,7 @@ module Graph {
       baseYear = Math.floor(baseYear);
       var targetIndex = this.yearToIndex(targetYear);
       var baseIndex = this.yearToIndex(baseYear);
-      return this.data.cpi.DataSet[targetIndex] / this.data.cpi.DataSet[baseIndex]; 
+      return this.data.cpi.DataSet[targetIndex] / this.data.cpi.DataSet[baseIndex];
     }
 
     // *******************************************************************
@@ -247,16 +216,16 @@ module Graph {
     private static key = (d): string => {
       return d.sp + '-' + d.fn + '-' + d.sb;
     }
-    
-    private static addKeysForD3 = (obj: any, idx:number): any => {
+
+    private static addKeysForD3 = (obj: any, idx: number): any => {
       obj.x = 3 * idx;
-      obj.y = 3*idx;
+      obj.y = 3 * idx;
       obj.cy = 200;
       obj.cx = 0;
       obj.radius = 4;
       return obj;
     }
-    
+
     private static collide = (node) => {
       var r = node.radius + 16,
         nx1 = node.x - r,
