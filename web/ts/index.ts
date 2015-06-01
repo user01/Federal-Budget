@@ -14,7 +14,7 @@ startend.on('range', (newRange): void=> { console.log(newRange); });
 
 
 var dataAll = new Utility.DataAll('data');
-dataAll.on('data', (data: Utility.DataSet): void=> {
+dataAll.on('data', (data: Utility.DataSets): void=> {
   console.log('data!', data);
   var spending = new Graph.Spending('graph-main',data);
 });
