@@ -75,13 +75,13 @@ module Graph {
         .range([0, radiusForAll]);
 
       this.color = d3.scale.linear()
-        .domain([this.height - 100, 100])
+        .domain([-30, 30]) //percent
         .range(["hsl(126, 100%, 24%)", "hsl(2, 100%, 24%)"]) //green to red
         .interpolate(d3.interpolateHsl);
 
       this.force = d3.layout.force()
         .gravity(3)
-        .charge(12)
+        .charge(-12)
         .friction(0.06)
         .size([this.width, this.height]);
 
@@ -124,10 +124,10 @@ module Graph {
         .enter().append("circle")
         .attr("class", "dot")
         .style("fill", 'red')
-        .style('stroke','black')
-//        .attr("r", (d) => { return Math.max(0,this.radius(d)-1); })
-//        .attr("cx", (d) => { return d.x; })
-//        .attr("cy", (d) => { return d.y; })
+        .style('stroke', 'black')
+      //        .attr("r", (d) => { return Math.max(0,this.radius(d)-1); })
+      //        .attr("cx", (d) => { return d.x; })
+      //        .attr("cy", (d) => { return d.y; })
         .on('mouseover', (d) => { console.log(d); })
       //      .style("fill", function(d) { return colorScale(color(d)); })
       //      .call(position)
@@ -143,8 +143,8 @@ module Graph {
       this.collectHeightWidth();
       this.backdrop.attr("width", this.width)
         .attr("height", this.height);
-      
-      
+
+
       var radiusForAll = d3.min([this.width, this.height]);
       this.radiusRawScale.range([0, radiusForAll]); //reset ranges
       
@@ -153,15 +153,15 @@ module Graph {
 
 
     private renderNewState = (): void => {
-      
+
       var dots = this.d3GraphElement
         .selectAll(".dot")
         .data(this.data.budget.DataSet, Spending.key)
         .transition().duration(250)
-        .attr("r", (d) => { return Math.max(0,this.radius(d)-1); })
+        .attr("r", (d) => { return Math.max(0, this.radius(d) - 1); })
         .attr("cx", (d) => { return d.x; })
         .attr("cy", (d) => { return d.y; })
-      
+
       this.force.start();
     }
 
@@ -180,19 +180,38 @@ module Graph {
     // Dot computaion functions
     // *******************************************************************
     private radius = (d: any): number => {
-      var value = Math.max(1e-5,d.data[this.yearToIndex(this.YearTo)]);
-      var rad = 10;
+      var value = this.value(d);
+      var rad;
       switch (this._mode) {
         case SpendingMode.Raw:
           rad = Math.max(0, this.radiusRawScale(value));
+          break;
+        case SpendingMode.GDP:
+          rad = 10;
           break;
       }
       d.radius = rad;
       return d.radius;
     }
+    
+    /** returns the *100 percent */
+    private deltaPercent = (d: any): number => {
+      var valueTo = this.value(d, this.YearTo);
+      var valueFrom = this.value(d, this.YearFrom);
+      return (valueTo - valueFrom) / valueFrom * 100;
+    }
 
-    private value = (d: any): number => {
-      return 7;
+    /** Compute the value of the node for the given year, considering the mode context */
+    private value = (d: any, yearIndex: number = this.YearTo): number => {
+      var val = d.data[this.yearToIndex(yearIndex)];
+      switch (this._mode) {
+        case SpendingMode.Raw:
+          break;
+        case SpendingMode.GDP:
+          val = val;//corrected vs GDP value
+          break;
+      }
+      return Math.max(1e-5, val); //ensure non-zero values
     }
 
     private yearToIndex = (year: number): number => {
