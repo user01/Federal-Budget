@@ -44,11 +44,25 @@ module Graph {
       this._mode = mode;
       //perform recomputes
     }
+    public get Mode():SpendingMode {
+      return this._mode;
+    }
+    private get CpiFactorToCurrentYear(): number {
+      return this.cpiFactor(this.YearTo);
+    }
+    
+    private _valueMaxRaw: number = 0;
+    private _valueMaxGdp: number = 0;
 
     constructor(private id: string, private data: Utility.DataSets) {
       super();
       this._yearTo = this.data.budget.YearEnd;
       this._yearFrom = this.data.budget.YearStart;
+      
+      
+      // compute max values for all modes
+//      this.valueMaxGdp = R.max(R.map(this.data.budget.DataSet))
+      this.maxvalueRawCompute();
 
       this.d3GraphElement = d3.select("#" + this.id);
       this.collectHeightWidth();
@@ -175,12 +189,18 @@ module Graph {
       //find the maxed sum of the current mode
       
     }
+    
 
     // *******************************************************************
     // Dot computaion functions
     // *******************************************************************
-    private radius = (d:any): number => {
-      return 10;
+    private radius = (d: any): number => {
+      var value = d.data[this.yearToIndex(this.YearTo)];
+      switch (this._mode) {
+        case SpendingMode.Raw:
+          return value;
+      }
+      return value;
     }
     
     private value = (d: any): number => {
@@ -188,7 +208,35 @@ module Graph {
     }
     
     private yearToIndex = (year: number): number => {
-      return Math.min(0,Math.floor(year) - this.data.budget.YearStart);
+      return Math.max(0,Math.floor(year) - this.data.budget.YearStart);
+    }
+    
+    private maxvalueRawCompute = (): number => {
+      var yearRange = R.range(this.data.budget.YearStart, this.data.budget.YearEnd + 1);
+      //compute the total for every year
+      var valuesArrays = R.pluck('data')(this.data.budget.DataSet);
+      console.log(valuesArrays);
+      
+      var valueAtYearIndex = R.pipe(this.yearToIndex, R.nth);
+      
+      var values = R.map((year: number): Array<number> => {
+        var inx = this.yearToIndex(year);
+        var valueAtThisIndex = valueAtYearIndex(year);
+        var valuesAtThisIndex = R.map(valueAtThisIndex)(valuesArrays);
+        var total = R.sum(valuesAtThisIndex);
+        return total;
+      })(yearRange);
+      this._valueMaxRaw = R.max(values); //in raw dollars
+      return this._valueMaxRaw;
+    }
+    
+    /** This factor times the dollar value in target year put it in base year (2014) dollars */
+    private cpiFactor = (targetYear: number, baseYear: number = 2014) => {
+      targetYear = Math.floor(targetYear);
+      baseYear = Math.floor(baseYear);
+      var targetIndex = this.yearToIndex(targetYear);
+      var baseIndex = this.yearToIndex(baseYear);
+      return this.data.cpi.DataSet[targetIndex] / this.data.cpi.DataSet[baseIndex]; 
     }
 
     // *******************************************************************
