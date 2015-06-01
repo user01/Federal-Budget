@@ -47,6 +47,8 @@ module Graph {
 
     constructor(private id: string, private data: Utility.DataSets) {
       super();
+      this._yearTo = this.data.budget.YearEnd;
+      this._yearFrom = this.data.budget.YearStart;
 
       this.d3GraphElement = d3.select("#" + this.id);
       this.collectHeightWidth();
