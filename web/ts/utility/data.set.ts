@@ -82,6 +82,21 @@ module Utility {
 
       this.runCallback('data', this);
     }
+    
+    public CullData = (yearStart: number, yearEnd: number): DataSet => {
+      if (yearStart > this._yearStart) {
+        //trim off the early
+        this._dataSet.splice(0, yearStart - this._yearStart);
+      }
+      if (yearEnd < this._yearEnd) {
+        var indexesToRetain = yearEnd - yearStart;
+        var indexesToRemove = this._yearEnd - yearEnd;
+        this._dataSet.splice(indexesToRetain, indexesToRemove);
+      }
+      this._yearStart = yearStart;
+      this._yearEnd = yearEnd;
+      return this;
+    }
 
     private renderError = (): void => {
       console.warn('Unable to get ', this.path);

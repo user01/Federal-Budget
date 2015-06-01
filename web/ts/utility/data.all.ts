@@ -6,7 +6,7 @@
 declare var R: any;
 
 module Utility {
-  interface DataSets { gdp: DataSet, cpi: DataSet, population: DataSet, budget: DataSet };
+  export interface DataSets { gdp: DataSet, cpi: DataSet, population: DataSet, budget: DataSet };
   export class DataAll extends CbBase {
     public sets: DataSets;
     
@@ -31,7 +31,13 @@ module Utility {
     
     private dataLoaded = (): void => {
       if (!DataAll.allReadySets(R.values(this.sets))) return;
-      this.runCallback('data', this.sets);
+      var grabYearStart = R.pipe(R.values, R.map(R.prop('YearStart')), R.max )(this.sets);
+      var grabYearEnd = R.pipe(R.values, R.map(R.prop('YearEnd')), R.min )(this.sets);
+      console.log('Data from ', grabYearStart, ' to ', grabYearEnd);
+      var sets = R.mapObj((ds: DataSet): DataSet => {
+        return ds.CullData(grabYearStart, grabYearEnd);
+      })(this.sets);
+      this.runCallback('data', sets);
     }
   }
 }
