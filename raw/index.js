@@ -131,7 +131,7 @@ csvParse(upperSet, function (err, data) {
   gdpSet.data = R.prop('data')(R.find(R.pipe(R.prop('sp'), R.eq('GDP')), gdpSet.data));
   delete gdpSet.sets;
   
-  richDat.sets = R.filter(R.pipe(R.prop('sp'), R.eq('GDP'), R.not), richDat.data);// screen out gdp
+  richDat.data = R.filter(R.pipe(R.prop('sp'), R.eq('GDP'), R.not), richDat.data);// screen out gdp
   fs.writeFileSync('./gdp.json', JSON.stringify(gdpSet));
   fs.writeFileSync('./budget.json', JSON.stringify(richDat));
 });
