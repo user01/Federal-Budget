@@ -25,7 +25,7 @@ module Utility {
       console.log('From ', this._yearStart, '-', this._yearEnd);
       console.log('To ', yearStart, '-', yearEnd);
       var sliceFrontCount = Math.max(0, yearStart - this._yearEnd);
-      var indexesToRetain = yearEnd - yearStart;
+      var indexesToRetain = yearEnd - yearStart + 1;
       var indexesToRemove = Math.max(0, this._yearEnd - yearEnd);
       console.log(sliceFrontCount, indexesToRetain, indexesToRemove);
       var handleValue = (value: any): any => {

@@ -89,7 +89,7 @@ module Utility {
         this._dataSet.splice(0, yearStart - this._yearStart);
       }
       if (yearEnd < this._yearEnd) {
-        var indexesToRetain = yearEnd - yearStart;
+        var indexesToRetain = yearEnd - yearStart + 1;
         var indexesToRemove = this._yearEnd - yearEnd;
         this._dataSet.splice(indexesToRetain, indexesToRemove);
       }
