@@ -54,6 +54,7 @@ module Graph {
     }
 
     private _valueMaxRaw: number = 0;
+    /** total fraction of GDP */
     private _valueMaxGdp: number = 0;
     private _superfunctions: Array<string> = Spending.pluckUniqueSuperFunctions(this.data.budget.DataSet);
     private _functions: Array<string> = Spending.pluckUniqueFunctions(this.data.budget.DataSet);
@@ -68,6 +69,7 @@ module Graph {
       // compute max values for all modes
       //      this.valueMaxGdp = R.max(R.map(this.data.budget.DataSet))
       this.maxvalueRawCompute();
+      this.maxvalueGDPCompute();
 
       this.d3GraphElement = d3.select("#" + this.id);
       this.collectHeightWidth();
@@ -84,7 +86,7 @@ module Graph {
         .interpolate(d3.interpolateRgb);
       this.superFunctionColor = d3.scale.category10();
 
-      
+
       this.force = d3.layout.force()
         .gravity(3)
         .charge(-12)
@@ -130,7 +132,7 @@ module Graph {
         .enter().append("circle")
         .attr("class", "dot")
         .style("fill", 'red')
-//        .style('stroke', 'black')
+      //        .style('stroke', 'black')
         .style('stroke', (d) => { return this.superFunctionColor(this._superfunctions.indexOf(d.sp)); })
       //        .attr("r", (d) => { return Math.max(0,this.radius(d)-1); })
       //        .attr("cx", (d) => { return d.x; })
@@ -229,6 +231,26 @@ module Graph {
       return Math.max(0, Math.floor(year) - this.data.budget.YearStart);
     }
 
+    private maxvalueGDPCompute = (): number => {
+      var yearRange = R.range(this.data.budget.YearStart, this.data.budget.YearEnd + 1);
+      //compute the total for every year
+      var valuesArrays = R.pluck('data')(this.data.budget.DataSet);
+      //console.log(valuesArrays);
+      
+      var valueAtYearIndex = R.pipe(this.yearToIndex, R.nth);
+
+      var values = R.map((year: number): number => {
+        var inx = this.yearToIndex(year);
+        var valueAtThisIndex = valueAtYearIndex(year);
+        var valuesAtThisIndex = R.map(valueAtThisIndex)(valuesArrays);
+        var total = R.sum(valuesAtThisIndex);
+        var gdpAtYear = this.data.gdp.DataSet[inx];
+        return total/gdpAtYear;
+      })(yearRange);
+      this._valueMaxGdp = R.max(values); //in fraction of gdp
+      return this._valueMaxGdp;
+    }
+
     private maxvalueRawCompute = (): number => {
       var yearRange = R.range(this.data.budget.YearStart, this.data.budget.YearEnd + 1);
       //compute the total for every year
@@ -237,7 +259,7 @@ module Graph {
       
       var valueAtYearIndex = R.pipe(this.yearToIndex, R.nth);
 
-      var values = R.map((year: number): Array<number> => {
+      var values = R.map((year: number): number => {
         var inx = this.yearToIndex(year);
         var valueAtThisIndex = valueAtYearIndex(year);
         var valuesAtThisIndex = R.map(valueAtThisIndex)(valuesArrays);
@@ -265,14 +287,14 @@ module Graph {
     private static key = (d): string => {
       return d.sp + '-' + d.fn + '-' + d.sb;
     }
-    
+
     private static pluckUniqueSuperFunctions = (dats: any[]): string[]=> {
       return R.pipe(R.pluck('sp'), R.uniq)(dats);
     }
     private static pluckUniqueFunctions = (dats: any[]): string[]=> {
       return R.pipe(R.pluck('fn'), R.uniq)(dats);
     }
-    
+
 
     private static addKeysForD3 = (obj: any, idx: number): any => {
       obj.x = 3 * idx;
