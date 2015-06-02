@@ -94,9 +94,9 @@ module Graph {
 
 
       this.force = d3.layout.force()
-        .gravity(3)
+        .gravity(0.2)
         .charge(-12)
-        .friction(0.26)
+        .friction(0.12)
         .size([this.width, this.height]);
 
 
@@ -148,6 +148,7 @@ module Graph {
         .on("mouseover", this.tooltipMouseOver)
         .on("mousemove", this.tooltipMouseMove)
         .on("mouseout", this.tooltipMouseOut)
+        .call(this.force.drag)
 
       d3.select(window).on('resize.' + this.id, this.resize);
       this.resize();
