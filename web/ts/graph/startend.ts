@@ -109,6 +109,17 @@ module Graph {
       this.width = parseInt(this.d3GraphElement.style("width")) - this.marginPx * 2;
       this.height = parseInt(this.d3GraphElement.style("height")) - this.marginPx * 2;
     }
+    
+    public forceNewRange = (from: number, to: number): void => {
+      this.rangeStart = from;
+      this.rangeEnd = to;
+      this.rangeCheck();
+      this.handleNewYears(null, 0);
+      this.runCallback('range', {
+        start: this.rangeStart,
+        end: this.rangeEnd
+      });
+    }
 
     public handleNewYears = (newData: any, durationFactor: number = 1): void => {
       if (newData) {
