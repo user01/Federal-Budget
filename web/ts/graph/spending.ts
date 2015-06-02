@@ -87,6 +87,7 @@ module Graph {
 
       this.color = d3.scale.linear()
         .domain([-30, 0, 30]) //percent
+        .clamp(true)
         .range(["rgb(150,0,0)", "rgb(0,0,0)", "rgb(0,150,0)"]) //green to red
         .interpolate(d3.interpolateRgb);
       this.superFunctionColor = d3.scale.category10();
