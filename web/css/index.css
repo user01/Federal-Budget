@@ -49,6 +49,9 @@ rect.backdrop {
   fill: none;
   pointer-events: all;
 }
+.dot {
+  stroke-width: 5px;
+}
 
 /* Utils */
 .name-title {

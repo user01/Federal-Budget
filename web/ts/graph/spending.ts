@@ -17,6 +17,7 @@ module Graph {
     private nodes: D3.Layout.GraphNodeForce[];
     private force: D3.Layout.ForceLayout;
     private color: D3.Scale.LinearScale;
+    private superFunctionColor: D3.Scale.OrdinalScale;
     private radiusRawScale: D3.Scale.LogScale;
 
     private _yearTo: number = 0;
@@ -78,10 +79,12 @@ module Graph {
         .range([0, radiusForAll]);
 
       this.color = d3.scale.linear()
-        .domain([-30, 30]) //percent
-        .range(["rgb(150,0,0)", "rgb(0,150,0)"]) //green to red
+        .domain([-30, 0, 30]) //percent
+        .range(["rgb(150,0,0)", "rgb(0,0,0)", "rgb(0,150,0)"]) //green to red
         .interpolate(d3.interpolateRgb);
+      this.superFunctionColor = d3.scale.category10();
 
+      
       this.force = d3.layout.force()
         .gravity(3)
         .charge(-12)
@@ -127,7 +130,8 @@ module Graph {
         .enter().append("circle")
         .attr("class", "dot")
         .style("fill", 'red')
-        .style('stroke', 'black')
+//        .style('stroke', 'black')
+        .style('stroke', (d) => { return this.superFunctionColor(this._superfunctions.indexOf(d.sp)); })
       //        .attr("r", (d) => { return Math.max(0,this.radius(d)-1); })
       //        .attr("cx", (d) => { return d.x; })
       //        .attr("cy", (d) => { return d.y; })
