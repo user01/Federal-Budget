@@ -19,6 +19,7 @@ module Graph {
     private color: D3.Scale.LinearScale;
     private superFunctionColor: D3.Scale.OrdinalScale;
     private radiusRawScale: D3.Scale.LogScale;
+    private radiusGdpScale: D3.Scale.LogScale;
 
     private _yearTo: number = 0;
     public get YearTo(): number {
@@ -79,6 +80,10 @@ module Graph {
       this.radiusRawScale = d3.scale.linear()
         .domain([1e-6, this._valueMaxRaw])
         .range([0, radiusForAll]);
+      
+      this.radiusGdpScale = d3.scale.linear()
+        .domain([1e-6, this._valueMaxGdp])
+        .range([0, radiusForAll]);
 
       this.color = d3.scale.linear()
         .domain([-30, 0, 30]) //percent
@@ -124,6 +129,7 @@ module Graph {
       this.force.nodes(this.data.budget.DataSet);
       this.nodes = this.force.nodes();
 
+      
       var dot = this.d3GraphElement.append("g")
         .attr("class", "dots")
         .selectAll(".dot")
@@ -141,6 +147,7 @@ module Graph {
       //      .style("fill", function(d) { return colorScale(color(d)); })
       //      .call(position)
       //      .sort(order);
+        .append('title').text((d) => { return d.sp;})
 
 
       d3.select(window).on('resize.' + this.id, this.resize);
@@ -200,7 +207,7 @@ module Graph {
           rad = Math.max(0, this.radiusRawScale(value));
           break;
         case SpendingMode.GDP:
-          rad = 10;
+          rad = Math.max(0, this.radiusGdpScale(value));
           break;
       }
       d.radius = rad;
@@ -221,7 +228,8 @@ module Graph {
         case SpendingMode.Raw:
           break;
         case SpendingMode.GDP:
-          val = val;//corrected vs GDP value
+          var inx = this.yearToIndex(yearIndex);
+          val = val / this.data.gdp.DataSet[inx];
           break;
       }
       return Math.max(1e-5, val); //ensure non-zero values
