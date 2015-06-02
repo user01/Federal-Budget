@@ -80,7 +80,7 @@ module Graph {
       this.radiusRawScale = d3.scale.linear()
         .domain([1e-6, this._valueMaxRaw])
         .range([0, radiusForAll]);
-      
+
       this.radiusGdpScale = d3.scale.linear()
         .domain([1e-6, this._valueMaxGdp])
         .range([0, radiusForAll]);
@@ -129,7 +129,8 @@ module Graph {
       this.force.nodes(this.data.budget.DataSet);
       this.nodes = this.force.nodes();
 
-      
+      var self = this;
+      this.hoverTooltip = d3.select("#tooltip");
       var dot = this.d3GraphElement.append("g")
         .attr("class", "dots")
         .selectAll(".dot")
@@ -138,17 +139,14 @@ module Graph {
         .enter().append("circle")
         .attr("class", "dot")
         .style("fill", 'red')
-      //        .style('stroke', 'black')
         .style('stroke', (d) => { return this.superFunctionColor(this._superfunctions.indexOf(d.sp)); })
-      //        .attr("r", (d) => { return Math.max(0,this.radius(d)-1); })
-      //        .attr("cx", (d) => { return d.x; })
-      //        .attr("cy", (d) => { return d.y; })
-        .on('mouseover', (d) => { console.log(d); })
-      //      .style("fill", function(d) { return colorScale(color(d)); })
+      //        .on('mouseover', (d) => { console.log(d); })
       //      .call(position)
       //      .sort(order);
-        .append('title').text((d) => { return d.sp;})
-
+      //        .append('title').text((d) => { return d.sp;})
+        .on("mouseover", this.tooltipMouseOver)
+        .on("mousemove", this.tooltipMouseMove)
+        .on("mouseout", this.tooltipMouseOut)
 
       d3.select(window).on('resize.' + this.id, this.resize);
       this.resize();
@@ -253,7 +251,7 @@ module Graph {
         var valuesAtThisIndex = R.map(valueAtThisIndex)(valuesArrays);
         var total = R.sum(valuesAtThisIndex);
         var gdpAtYear = this.data.gdp.DataSet[inx];
-        return total/gdpAtYear;
+        return total / gdpAtYear;
       })(yearRange);
       this._valueMaxGdp = R.max(values); //in fraction of gdp
       return this._valueMaxGdp;
@@ -288,8 +286,35 @@ module Graph {
     }
 
     // *******************************************************************
-    // Statics
+    // Tooltips
     // *******************************************************************
+    private hoverTooltip: D3._Selection<any>;
+
+    private tooltipMouseOver = (d: any): void => {
+      //Update the tooltip position and value
+      this.hoverTooltip
+        .select("#value")
+        .text(d.sp);
+      this.tooltipMouseMove(d);
+      
+      //Show the tooltip
+      this.hoverTooltip.classed("hidden", false);
+    }
+    private tooltipMouseMove = (d: any): void => {
+      var xPosition = d3.event.x;
+      var yPosition = d3.event.y;
+
+      //Update the tooltip position and value
+      this.hoverTooltip
+        .style("left", xPosition + "px")
+        .style("top", yPosition + "px")
+    }
+    private tooltipMouseOut = (d: any): void => {
+      this.hoverTooltip.classed("hidden", true);
+    }
+    
+    // *******************************************************************
+    // Statics
     // *******************************************************************
 
     private static key = (d): string => {
