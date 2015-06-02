@@ -79,13 +79,13 @@ module Graph {
 
       this.color = d3.scale.linear()
         .domain([-30, 30]) //percent
-        .range(["hsl(126, 100%, 24%)", "hsl(2, 100%, 24%)"]) //green to red
-        .interpolate(d3.interpolateHsl);
+        .range(["rgb(150,0,0)", "rgb(0,150,0)"]) //green to red
+        .interpolate(d3.interpolateRgb);
 
       this.force = d3.layout.force()
         .gravity(3)
         .charge(-12)
-        .friction(0.06)
+        .friction(0.26)
         .size([this.width, this.height]);
 
 
@@ -161,6 +161,7 @@ module Graph {
         .selectAll(".dot")
         .data(this.data.budget.DataSet, Spending.key)
         .transition().duration(250)
+        .style("fill", (d) => { return this.color(this.deltaPercent(d)); })
         .attr("r", (d) => { return Math.max(0, this.radius(d) - 1); })
         .attr("cx", (d) => { return d.x; })
         .attr("cy", (d) => { return d.y; })

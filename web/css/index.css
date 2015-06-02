@@ -46,7 +46,7 @@
   fill-opacity: 0.5;
 }
 rect.backdrop {
-  fill: teal;
+  fill: none;
   pointer-events: all;
 }
 
