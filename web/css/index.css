@@ -2,7 +2,6 @@
 /* Graphs Styling */
 .graph-wrapper {
   height: 40vh;
-  outline: 1px red solid;
   padding: 0.2em 1em;
   cursor: default;
 }
@@ -13,7 +12,6 @@
 
 .graph-timeline-wrapper {
   height: 3em;
-  outline: 1px blue solid;
   padding: 0 1em 0 1em;
   cursor: default;
 }
