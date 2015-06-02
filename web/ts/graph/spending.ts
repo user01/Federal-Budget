@@ -154,7 +154,7 @@ module Graph {
       this.RenderNewState();
     }
 
-
+    private _lastYearTo: number = 900000;
     public RenderNewState = (): void => {
 
       var dots = this.d3GraphElement
@@ -166,7 +166,10 @@ module Graph {
         .attr("cx", (d) => { return d.x; })
         .attr("cy", (d) => { return d.y; })
 
-      this.force.start();
+      if (this._lastYearTo != this.YearTo) {
+        this.force.start();
+        this._lastYearTo = this.YearTo;
+      }
     }
 
     protected collectHeightWidth = (): void => {

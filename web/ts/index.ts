@@ -18,8 +18,8 @@ dataAll.on('data', (data: Utility.DataSets): void=> {
   console.log('data!', data);
   spending = new Graph.Spending('graph-main', data);
   startend.on('range', (newRange): void=> {
-    spending.YearTo = newRange.end;
     spending.YearFrom = newRange.start;
+    spending.YearTo = newRange.end;
     spending.RenderNewState();
   });
   
