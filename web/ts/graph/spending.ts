@@ -173,7 +173,7 @@ module Graph {
       this.elevationScale
         .range([this.height * 0.7, this.height * 0.5, this.height * 0.3])
       this.data.budget.DataSet = R.mapIndexed(this.setCyForObj)(this.data.budget.DataSet);
-      
+
       this.RenderNewState();
     }
 
@@ -305,8 +305,37 @@ module Graph {
     private tooltipMouseOver = (d: any): void => {
       //Update the tooltip position and value
       this.hoverTooltip
-        .select("#value")
+        .select("#super")
         .text(d.sp);
+      this.hoverTooltip
+        .select("#function")
+        .text(d.fn);
+
+      this.hoverTooltip
+        .select("#sub")
+        .text((d.fn != d.sb) ? d.sb : '');
+
+      var valueField = this.hoverTooltip.select('#value');
+      var deltaField = this.hoverTooltip.select('#delta');
+      var value = this.value(d);
+      var Pd = Math.floor(this.deltaPercent(d) * 10) / 10 + '%';
+      deltaField.text(Pd);
+
+      switch (this._mode) {
+        case SpendingMode.Raw:
+          var out = value > 1000000000 ? (Math.round(value / 100000000) / 10) + ' billion' :
+            (Math.round(value / 100000) / 10) + ' million';
+          valueField.text('$ ' + out);
+          break;
+        case SpendingMode.GDP:
+          var oute = Math.floor(value * 10000) / 100;
+          valueField.text(oute + '%');
+          break;
+        default:
+          valueField.text('Unknown mode');
+          break;
+      }
+
       this.tooltipMouseMove(d);
       
       //Show the tooltip
