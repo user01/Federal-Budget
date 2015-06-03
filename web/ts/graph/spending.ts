@@ -90,7 +90,7 @@ module Graph {
       this.color = d3.scale.linear()
         .domain(perDiffRanges) //percent
         .clamp(true)
-        .range(["rgb(150,0,0)", "rgb(0,0,0)", "rgb(0,150,0)"]) //green to red
+        .range(["rgb(150,0,0)", "rgb(193,193,193)", "rgb(0,150,0)"]) //green to red
         .interpolate(d3.interpolateRgb);
       this.superFunctionColor = d3.scale.category10();
 
@@ -318,8 +318,9 @@ module Graph {
       var valueField = this.hoverTooltip.select('#value');
       var deltaField = this.hoverTooltip.select('#delta');
       var value = this.value(d);
-      var Pd = Math.floor(this.deltaPercent(d) * 10) / 10 + '%';
-      deltaField.text(Pd);
+      var Pd = Math.floor(this.deltaPercent(d) * 10) / 10;
+      var prefix = Pd > 0 ? '+' : '';
+      deltaField.text(prefix + Pd + '%');
 
       switch (this._mode) {
         case SpendingMode.Raw:
