@@ -12,6 +12,10 @@ var onReady = (): void => {
   var yearFrom = document.getElementById('year-from');
   var yearTo = document.getElementById('year-to');
 
+
+  var btnRaw = document.getElementById('correction-raw');
+  var btnGDP = document.getElementById('correction-ofgdp');
+  var btnPerCap = document.getElementById('correction-percaptia');
   //start/end tooly graph
   var startend = new Graph.StartEnd('graph-timeline');
   //startend.on('range', (newRange): void=> { console.log(newRange); });
@@ -31,6 +35,15 @@ var onReady = (): void => {
     spending = new Graph.Spending('graph-main', data);
     startend.on('range', newRangeHandler);
     startend.forceNewRange(1980, 2010);
+    
+    btnRaw.onclick = () => {
+      spending.Mode = Graph.SpendingMode.Raw;
+      spending.RenderNewState();
+    }
+    btnGDP.onclick = () => {
+      spending.Mode = Graph.SpendingMode.GDP;
+      spending.RenderNewState();
+    }
   });
   dataAll.Initialize();
 }
