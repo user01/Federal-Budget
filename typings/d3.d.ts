@@ -2779,7 +2779,9 @@ declare module D3 {
 
         export interface SqrtScale extends GenericQuantitativeScale<SqrtScale> { }
 
-        export interface PowScale extends GenericQuantitativeScale<PowScale> { }
+        export interface PowScale extends GenericQuantitativeScale<PowScale> {
+          exponent(expo: number): PowScale;
+        }
 
         export interface LogScale extends GenericQuantitativeScale<LogScale> { }
 
