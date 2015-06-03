@@ -20,6 +20,7 @@ module Graph {
     private superFunctionColor: D3.Scale.OrdinalScale;
     private radiusRawScale: D3.Scale.LogScale;
     private radiusGdpScale: D3.Scale.LogScale;
+    private elevationScale: D3.Scale.LinearScale;
 
     private _yearTo: number = 0;
     public get YearTo(): number {
@@ -85,13 +86,19 @@ module Graph {
         .domain([1e-6, this._valueMaxGdp])
         .range([0, radiusForAll]);
 
+      var perDiffRanges = [-30, 0, 30];
       this.color = d3.scale.linear()
-        .domain([-30, 0, 30]) //percent
+        .domain(perDiffRanges) //percent
         .clamp(true)
         .range(["rgb(150,0,0)", "rgb(0,0,0)", "rgb(0,150,0)"]) //green to red
         .interpolate(d3.interpolateRgb);
       this.superFunctionColor = d3.scale.category10();
 
+
+      this.elevationScale = d3.scale.linear()
+        .domain(perDiffRanges)
+        .clamp(true)
+        .range([this.height * 0.7, this.height * 0.5, this.height * 0.3])
 
       this.force = d3.layout.force()
         .gravity(0.2)
@@ -105,7 +112,6 @@ module Graph {
         .attr('class', 'backdrop')
         .attr("width", this.width)
         .attr("height", this.height);
-
       this.force.on("tick", (e: any) => {
         var k = e.alpha * .1;
         this.nodes.forEach((node: any) => {
@@ -163,6 +169,10 @@ module Graph {
 
       var radiusForAll = d3.min([this.width, this.height]);
       this.radiusRawScale.range([0, radiusForAll]); //reset ranges
+      
+      this.elevationScale
+        .range([this.height * 0.7, this.height * 0.5, this.height * 0.3])
+      this.data.budget.DataSet = R.mapIndexed(this.setCyForObj)(this.data.budget.DataSet);
       
       this.RenderNewState();
     }
@@ -313,6 +323,11 @@ module Graph {
     }
     private tooltipMouseOut = (d: any): void => {
       this.hoverTooltip.classed("hidden", true);
+    }
+    private setCyForObj = (d: any, idx: number): any => {
+      var per = this.deltaPercent(d);
+      d.cy = this.elevationScale(per);
+      return d;
     }
     
     // *******************************************************************
