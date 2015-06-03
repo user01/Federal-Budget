@@ -318,8 +318,9 @@ module Graph {
       var valueField = this.hoverTooltip.select('#value');
       var deltaField = this.hoverTooltip.select('#delta');
       var value = this.value(d);
-      var Pd = Math.floor(this.deltaPercent(d) * 10) / 10;
+      var Pd:number|string = Math.floor(this.deltaPercent(d) * 10) / 10;
       var prefix = Pd > 0 ? '+' : '';
+      Pd = Pd < 100000000000000 ? Pd : 'From Nothing';
       deltaField.text(prefix + Pd + '%');
 
       switch (this._mode) {
