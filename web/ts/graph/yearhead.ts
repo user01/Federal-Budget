@@ -10,8 +10,8 @@ module Graph {
     private height: number = 0;
     private marginPx: number = 8;
 
-    private rangeStart: number = 0;
-    private rangeEnd: number = 0;
+    private targetYear: number = 0;
+    private currentYear: number = 0;
 
 
     private graphSvg: D3._Selection<any>;
@@ -27,7 +27,6 @@ module Graph {
       private yearEnd: number = 2013) {
       super();
 
-      this.rangeCheck();
       this.d3GraphElement = d3.select("#" + this.id);
       this.collectHeightWidth();
 
@@ -68,33 +67,15 @@ module Graph {
     private handleClick = (x: number): void => {
       var clickedDate = this.xScale.invert(x);
       var fullYear = clickedDate.getFullYear();
-      var distToStart = Math.abs(this.rangeStart - fullYear);
-      var distToEnd = Math.abs(this.rangeEnd - fullYear);
-      if (distToStart < distToEnd) {
-        //closer to start
-        this.rangeStart = fullYear;
-      } else {
-        //closer to end
-        this.rangeEnd = fullYear;
-      }
-      this.rangeCheck();
-      this.handleNewYears(null, 0.2);
-      this.runCallback('range', {
-        start: this.rangeStart,
-        end: this.rangeEnd
-      });
+      this.targetYear = fullYear;
+
+      this.handleNewYear(-1);
+      // this.runCallback('range', {
+      //   start: this.targetYear,
+      //   end: this.currentYear
+      // });
     }
 
-    private rangeCheck = (): void => {
-      if (this.rangeStart >= this.rangeEnd) {
-        this.rangeStart = this.rangeEnd - 1;
-      }
-      if (this.rangeStart < this.yearStart || this.rangeStart > this.yearEnd ||
-        this.rangeEnd < this.yearStart || this.rangeEnd > this.yearEnd) {
-        this.rangeStart = Math.floor((this.yearEnd - this.yearStart) / 2 + this.yearStart);
-        this.rangeEnd = Math.floor((this.yearEnd - this.yearStart) / 2 + this.yearStart) + 1;
-      }
-    }
 
     protected resize = (): void => {
       this.collectHeightWidth();
@@ -104,7 +85,7 @@ module Graph {
       this.graphSvg
         .attr("width", this.width + this.marginPx * 2)
         .attr("height", this.height + this.marginPx * 2)
-      this.handleNewYears(null, 0);
+      this.handleNewYear(-1, 0);
     }
 
     protected collectHeightWidth = (): void => {
@@ -112,23 +93,16 @@ module Graph {
       this.height = parseInt(this.d3GraphElement.style("height")) - this.marginPx * 2;
     }
 
-    public forceNewRange = (from: number, to: number): void => {
-      this.rangeStart = from;
-      this.rangeEnd = to;
-      this.rangeCheck();
-      this.handleNewYears(null, 0);
-      this.runCallback('range', {
-        start: this.rangeStart,
-        end: this.rangeEnd
-      });
+    public SetRange(yearStart: number, yearEnd: number): void {
+      this.yearStart = yearStart;
+      this.yearEnd = yearEnd;
+      this.handleNewYear();
     }
 
-    public handleNewYears = (newData: any, durationFactor: number = 1): void => {
-      if (newData) {
-        this.yearStart = newData.yearStart;
-        this.yearEnd = newData.yearEnd;
-        this.rangeCheck();
-      }
+    public handleNewYear = (newRenderYear: number = -1,
+      durationFactor: number = 1): void => {
+      console.log('start ', this.yearStart, ' end ', this.yearEnd);
+
       var durationMs = 250 * durationFactor;
 
       this.xScale.domain([
@@ -158,8 +132,8 @@ module Graph {
 
       this.areaRange.y0(this.height); //adjust the fill region of the area
       var t0 = this.graphSvg.transition().duration(durationMs);
-      var sixBack = '06-15-' + (this.rangeStart - 1);
-      var sixForward = '06-15-' + (this.rangeStart);
+      var sixBack = '06-15-' + (this.targetYear - 1);
+      var sixForward = '06-15-' + (this.targetYear);
       t0.select(".area.alive").attr("d", this.areaRange([sixBack, sixForward]));
       // t0.select(".area.alive").attr("d", this.areaRange([this.rangeStart - 1, this.rangeStart + 1]));
       // t0.select(".area.alive").attr("d", this.areaRange([this.rangeStart, this.rangeEnd]));

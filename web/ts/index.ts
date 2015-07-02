@@ -4,7 +4,7 @@
 /// <reference path="utility/data.all.ts" />
 
 
-declare var R:any;
+declare var R: any;
 var onReady = (): void => {
 
 
@@ -33,13 +33,13 @@ var onReady = (): void => {
 
   var spending: Graph.Spending;
   var dataAll = new Utility.DataAll('data');
-  dataAll.on('data', (data: Utility.DataSets): void=> {
+  dataAll.on('data', (data: Utility.DataAll): void=> {
     console.log('data!', data);
-    spending = new Graph.Spending('graph-main', data);
+    spending = new Graph.Spending('graph-main', data.Sets);
     startend.on('range', newRangeHandler);
     startend.forceNewRange(1980, 2010);
-    yearHead.forceNewRange(1980, 2010);
-    
+    yearHead.SetRange(data.YearStart, data.YearEnd);
+
     btnRaw.onclick = () => {
       spending.Mode = Graph.SpendingMode.Raw;
       spending.RenderNewState();
