@@ -22,26 +22,6 @@ module Graph {
     private radiusGdpScale: D3.Scale.LogScale;
     private elevationScale: D3.Scale.LinearScale;
 
-    // private _yearTo: number = 0;
-    // public get YearTo(): number {
-    //   return this._yearTo;
-    // }
-    // public set YearTo(year: number) {
-    //   this._yearTo = Math.min(Math.max(this.data.Sets.budget.YearStart + 1, year), this.data.Sets.budget.YearEnd);
-    //   if (this._yearTo <= this._yearFrom) {
-    //     this._yearFrom = this._yearTo - 1;
-    //   }
-    // }
-    // private _yearFrom: number = 0;
-    // public get YearFrom(): number {
-    //   return this._yearFrom;
-    // }
-    // public set YearFrom(year: number) {
-    //   this._yearFrom = Math.min(Math.max(this.data.Sets.budget.YearStart, year), this.data.Sets.budget.YearEnd - 1);
-    //   if (this._yearTo <= this._yearFrom) {
-    //     this._yearTo = this._yearFrom + 1;
-    //   }
-    // }
 
     private _year: number = 0;
     public get Year(): number {
@@ -50,6 +30,18 @@ module Graph {
     public set Year(year: number) {
       this._year = Math.min(this.data.YearEnd - 1,
         Math.max(this.data.YearStart, year));
+    }
+
+    private _yearDesired: number = 0;
+    public get YearDesired(): number {
+      return this._yearDesired;
+    }
+    public set YearDesired(year: number) {
+      this._yearDesired = Math.min(this.data.YearEnd - 1,
+        Math.max(this.data.YearStart, year));
+      if (this.YearDesired != this.Year) {
+        this.RenderNewState();
+      }
     }
 
     private _mode: SpendingMode = SpendingMode.Raw;
@@ -73,6 +65,7 @@ module Graph {
     constructor(private id: string, private data: Utility.DataAll) {
       super();
       this.Year = this.data.Sets.budget.YearStart;
+      this.YearDesired = this.Year;
       
       
       
@@ -94,7 +87,7 @@ module Graph {
         .domain([1e-6, this._valueMaxGdp])
         .range([0, radiusForAll]);
 
-      var perDiffRanges = [-30, 0, 30];
+      var perDiffRanges = [-5, 0, 5];
       this.color = d3.scale.linear()
         .domain(perDiffRanges) //percent
         .clamp(true)
@@ -185,17 +178,30 @@ module Graph {
       this.RenderNewState();
     }
 
-    private _lastYearTo: number = 900000;
     public RenderNewState = (): void => {
+      console.log('Desired: ', this.YearDesired, ' at ', this.Year);
+      if (this.YearDesired > this.Year) {
+        this.Year++;
+      } else if (this.YearDesired < this.Year) {
+        this.Year--;
+      }
 
       var dots = this.d3GraphElement
         .selectAll(".dot")
         .data(this.data.Sets.budget.DataSet, Spending.key)
-        .transition().duration(250)
+        .transition().ease('linear').duration(250)
         .style("stroke", (d) => { return this.color(this.deltaPercent(d)); })
         .attr("r", (d) => { return Math.max(0, this.radius(d) - 1); })
-        .attr("cx", (d) => { return d.x; })
-        .attr("cy", (d) => { return d.y; })
+        // .attr("cx", (d) => { return d.x; })
+        // .attr("cy", (d) => { return d.y; })
+        .call(Spending.endall, () => {
+          console.log("all done");
+
+          if (this.YearDesired == this.Year) {
+            return;
+          }
+          this.RenderNewState();
+        });
       this.force.start();
     }
 
@@ -231,7 +237,7 @@ module Graph {
     /** returns the *100 percent */
     private deltaPercent = (d: any): number => {
       if (this.Year <= this.data.YearStart) return 0;
-      
+
       var valueTo = this.value(d, this.Year);
       var valueFrom = this.value(d, this.Year - 1);
       return (valueTo - valueFrom) / valueFrom * 100;
@@ -382,6 +388,13 @@ module Graph {
       return R.pipe(R.pluck('fn'), R.uniq)(dats);
     }
 
+    private static endall(transition, callback) {
+      if (transition.size() === 0) { callback() }
+      var n = 0;
+      transition
+        .each(function() { ++n; })
+        .each("end", function() { if (!--n) callback.apply(this, arguments); });
+    }
 
     private static addKeysForD3 = (obj: any, idx: number): any => {
       obj.x = 3 * idx;
