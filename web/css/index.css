@@ -43,6 +43,11 @@
   fill: #5DA5DA;
   fill-opacity: 0.5;
 }
+.current.area {
+  stroke: none;
+  fill: #0D053A;
+  fill-opacity: 0.5;
+}
 rect.backdrop {
   fill: none;
   pointer-events: all;

@@ -18,6 +18,7 @@ module Graph {
     private xScale: D3.Scale.TimeScale;
     private yScale: D3.Scale.LinearScale;
     private areaRange: D3.Svg.Area;
+    private areaCurrent: D3.Svg.Area;
 
     private static parseDate: (src: string) => Date = d3.time.format("%m-%d-%Y").parse;
     private static parseYear: (src: string) => Date = d3.time.format("%Y").parse;
@@ -41,6 +42,10 @@ module Graph {
         .x((d) => { return this.xScale(YearHead.parseDate(d + '')); })
         .y0(this.height)
         .y1((d) => { return 0.75; });
+      this.areaCurrent = d3.svg.area()
+        .x((d) => { return this.xScale(YearHead.parseDate(d + '')); })
+        .y0(this.height)
+        .y1((d) => { return 0.75; });
 
       this.graphSvg = this.d3GraphElement
         .attr("width", this.width + this.marginPx * 2)
@@ -50,6 +55,8 @@ module Graph {
 
       this.graphSvg.append("path")
         .attr("class", "area alive");
+      this.graphSvg.append("path")
+        .attr("class", "area current");
 
       //debounce this
       d3.select(window).on('resize.' + this.id, this.resize);
@@ -134,7 +141,10 @@ module Graph {
       var t0 = this.graphSvg.transition().duration(durationMs);
       var sixBack = '06-15-' + (this.targetYear - 1);
       var sixForward = '06-15-' + (this.targetYear);
+      var twoBack = '10-15-' + (this.targetYear - 1);
+      var twoForward = '02-15-' + (this.targetYear);
       t0.select(".area.alive").attr("d", this.areaRange([sixBack, sixForward]));
+      t0.select(".area.current").attr("d", this.areaRange([twoBack, twoForward]));
       // t0.select(".area.alive").attr("d", this.areaRange([this.rangeStart - 1, this.rangeStart + 1]));
       // t0.select(".area.alive").attr("d", this.areaRange([this.rangeStart, this.rangeEnd]));
     }
