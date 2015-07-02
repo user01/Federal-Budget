@@ -64,7 +64,7 @@ module Graph {
 
     constructor(private id: string, private data: Utility.DataAll) {
       super();
-      this.Year = this.data.Sets.budget.YearStart;
+      this.Year = this.data.Sets.budget.YearEnd;
       this.YearDesired = this.Year;
       
       
