@@ -40,14 +40,8 @@ module Graph {
         .range([this.height, 0])
         .domain([0, 1])
         .nice();
-      this.areaRange = d3.svg.area()
-        .x((d) => { return this.xScale(YearHead.parseDate(d + '')); })
-        .y0(this.height)
-        .y1((d) => { return 0.75; });
-      this.areaCurrent = d3.svg.area()
-        .x((d) => { return this.xScale(YearHead.parseDate(d + '')); })
-        .y0(this.height)
-        .y1((d) => { return 0.75; });
+      this.areaRange = this.generateArea();
+      this.areaCurrent = this.generateArea();
 
       this.graphSvg = this.d3GraphElement
         .attr("width", this.width + this.marginPx * 2)
@@ -71,6 +65,13 @@ module Graph {
         console.log(x);
         clickHandler(x);
       });
+    }
+
+    private generateArea(): D3.Svg.Area {
+      return d3.svg.area()
+        .x((d) => { return this.xScale(YearHead.parseDate(d + '')); })
+        .y0(this.height)
+        .y1((d) => { return 0.75; });
     }
 
     private handleClick = (x: number): void => {
