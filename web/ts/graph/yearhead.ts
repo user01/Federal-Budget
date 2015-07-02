@@ -19,6 +19,7 @@ module Graph {
     private yScale: D3.Scale.LinearScale;
     private areaRange: D3.Svg.Area;
 
+    private static parseDate: (src: string) => Date = d3.time.format("%m-%d-%Y").parse;
     private static parseYear: (src: string) => Date = d3.time.format("%Y").parse;
 
     constructor(private id: string,
@@ -38,7 +39,7 @@ module Graph {
         .domain([0, 1])
         .nice();
       this.areaRange = d3.svg.area()
-        .x((d) => { return this.xScale(YearHead.parseYear(d + '')); })
+        .x((d) => { return this.xScale(YearHead.parseDate(d + '')); })
         .y0(this.height)
         .y1((d) => { return 0.75; });
 
@@ -52,13 +53,14 @@ module Graph {
         .attr("class", "area alive");
 
       //debounce this
-      d3.select(window).on('resize.'+this.id, this.resize);
+      d3.select(window).on('resize.' + this.id, this.resize);
       this.resize();
 
       var clickHandler = this.handleClick;
       this.d3GraphElement.on("click", function() {
         var p1 = d3.mouse(this);
         var x = p1[0];
+        console.log(x);
         clickHandler(x);
       });
     }
@@ -109,7 +111,7 @@ module Graph {
       this.width = parseInt(this.d3GraphElement.style("width")) - this.marginPx * 2;
       this.height = parseInt(this.d3GraphElement.style("height")) - this.marginPx * 2;
     }
-    
+
     public forceNewRange = (from: number, to: number): void => {
       this.rangeStart = from;
       this.rangeEnd = to;
@@ -154,10 +156,13 @@ module Graph {
           .style("text-anchor", "start");
       }
 
-
       this.areaRange.y0(this.height); //adjust the fill region of the area
       var t0 = this.graphSvg.transition().duration(durationMs);
-      t0.select(".area.alive").attr("d", this.areaRange([this.rangeStart, this.rangeEnd]));
+      var sixBack = '06-15-' + (this.rangeStart - 1);
+      var sixForward = '06-15-' + (this.rangeStart);
+      t0.select(".area.alive").attr("d", this.areaRange([sixBack, sixForward]));
+      // t0.select(".area.alive").attr("d", this.areaRange([this.rangeStart - 1, this.rangeStart + 1]));
+      // t0.select(".area.alive").attr("d", this.areaRange([this.rangeStart, this.rangeEnd]));
     }
   }
 }
