@@ -79,11 +79,8 @@ module Graph {
       var fullYear = clickedDate.getFullYear();
       this.targetYear = fullYear;
 
-      this.handleNewYear(-1);
-      // this.runCallback('range', {
-      //   start: this.targetYear,
-      //   end: this.currentYear
-      // });
+      this.handleNewYear();
+      this.runCallback('newTarget', this.targetYear);
     }
 
 
@@ -109,9 +106,12 @@ module Graph {
       this.handleNewYear();
     }
 
-    public handleNewYear = (newRenderYear: number = -1,
+    public handleNewYear = (newCurrentYear: number = -1,
       durationFactor: number = 1): void => {
       console.log('start ', this.yearStart, ' end ', this.yearEnd);
+      if (newCurrentYear > 0) {
+        this.currentYear = newCurrentYear;
+      }
 
       var durationMs = 250 * durationFactor;
 
@@ -144,8 +144,8 @@ module Graph {
       var t0 = this.graphSvg.transition().duration(durationMs);
       var sixBack = '06-15-' + (this.targetYear - 1);
       var sixForward = '06-15-' + (this.targetYear);
-      var twoBack = '10-15-' + (this.targetYear - 1);
-      var twoForward = '02-15-' + (this.targetYear);
+      var twoBack = '10-15-' + (this.currentYear - 1);
+      var twoForward = '02-15-' + (this.currentYear);
       t0.select(".area.alive").attr("d", this.areaRange([sixBack, sixForward]));
       t0.select(".area.current").attr("d", this.areaRange([twoBack, twoForward]));
       // t0.select(".area.alive").attr("d", this.areaRange([this.rangeStart - 1, this.rangeStart + 1]));

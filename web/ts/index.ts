@@ -43,6 +43,7 @@ var onReady = (): void => {
     startend.on('range', newRangeHandler);
     startend.forceNewRange(1980, 2010);
     yearHead.SetRange(data.YearStart, data.YearEnd);
+    yearHead.on('newTarget', newTargetYearHandler);
 
     btnRaw.onclick = () => {
       spending.Mode = Graph.SpendingMode.Raw;
