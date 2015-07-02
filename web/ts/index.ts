@@ -1,4 +1,5 @@
 /// <reference path="graph/startend.ts" />
+/// <reference path="graph/yearhead.ts" />
 /// <reference path="graph/spending.ts" />
 /// <reference path="utility/data.all.ts" />
 
@@ -17,7 +18,9 @@ var onReady = (): void => {
   var btnGDP = document.getElementById('correction-ofgdp');
   var btnPerCap = document.getElementById('correction-percaptia');
   //start/end tooly graph
+  var yearHead = new Graph.YearHead('graph-timeline-header');
   var startend = new Graph.StartEnd('graph-timeline');
+  // graph-timeline-header
   //startend.on('range', (newRange): void=> { console.log(newRange); });
 
   var newRangeHandler = (newRange): void=> {
@@ -35,6 +38,7 @@ var onReady = (): void => {
     spending = new Graph.Spending('graph-main', data);
     startend.on('range', newRangeHandler);
     startend.forceNewRange(1980, 2010);
+    yearHead.forceNewRange(1980, 2010);
     
     btnRaw.onclick = () => {
       spending.Mode = Graph.SpendingMode.Raw;
