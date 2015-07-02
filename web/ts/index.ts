@@ -30,7 +30,7 @@ var onReady = (): void => {
     yearTo.textContent = newRange.end;
     spending.RenderNewState();
   }
-  
+
   var newTargetYearHandler = (newYear): void => {
     console.log('year!', newYear);
     spending.YearDesired = newYear;
@@ -45,6 +45,10 @@ var onReady = (): void => {
     startend.forceNewRange(1980, 2010);
     yearHead.SetRange(data.YearStart, data.YearEnd);
     yearHead.on('newTarget', newTargetYearHandler);
+
+    spending.on('renderedYear', (year: number) => {
+      yearTo.textContent = year + '';
+    });
 
     btnRaw.onclick = () => {
       spending.Mode = Graph.SpendingMode.Raw;

@@ -189,14 +189,13 @@ module Graph {
       var dots = this.d3GraphElement
         .selectAll(".dot")
         .data(this.data.Sets.budget.DataSet, Spending.key)
-        .transition().ease('linear').duration(250)
+        .transition().ease('linear').duration(150)
         .style("stroke", (d) => { return this.color(this.deltaPercent(d)); })
         .attr("r", (d) => { return Math.max(0, this.radius(d) - 1); })
         // .attr("cx", (d) => { return d.x; })
         // .attr("cy", (d) => { return d.y; })
         .call(Spending.endall, () => {
-          console.log("all done");
-
+          this.runCallback('renderedYear', this.Year);
           if (this.YearDesired == this.Year) {
             return;
           }
