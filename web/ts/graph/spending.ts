@@ -188,7 +188,7 @@ module Graph {
         .attr("r", (d) => { return Math.max(0, this.radius(d) - 1); })
         .attr("cx", (d) => { return d.x; })
         .attr("cy", (d) => { return d.y; })
-
+      this.force.start();
       if (this._lastYearTo != this.YearTo) {
         this.force.start();
         this._lastYearTo = this.YearTo;
@@ -318,7 +318,7 @@ module Graph {
       var valueField = this.hoverTooltip.select('#value');
       var deltaField = this.hoverTooltip.select('#delta');
       var value = this.value(d);
-      var Pd:number|string = Math.floor(this.deltaPercent(d) * 10) / 10;
+      var Pd: number|string = Math.floor(this.deltaPercent(d) * 10) / 10;
       var prefix = Pd > 0 ? '+' : '';
       Pd = Pd < 100000000000000 ? Pd : 'From Nothing';
       deltaField.text(prefix + Pd + '%');
