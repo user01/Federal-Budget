@@ -62,7 +62,6 @@ module Graph {
       this.d3GraphElement.on("click", function() {
         var p1 = d3.mouse(this);
         var x = p1[0];
-        console.log(x);
         clickHandler(x);
       });
     }
@@ -107,11 +106,12 @@ module Graph {
     }
 
     public handleNewYear = (newCurrentYear: number = -1,
+      newTargetYear:number = -1,
       durationFactor: number = 1): void => {
-      console.log('start ', this.yearStart, ' end ', this.yearEnd);
-      if (newCurrentYear > 0) {
-        this.currentYear = newCurrentYear;
-      }
+      this.currentYear = (newCurrentYear > 0) ? newCurrentYear : this.currentYear;
+      this.targetYear = (newTargetYear > 0) ? newTargetYear : this.targetYear;
+      
+      
 
       var durationMs = 250 * durationFactor;
 
@@ -147,9 +147,26 @@ module Graph {
       var twoBack = '10-15-' + (this.currentYear - 1);
       var twoForward = '02-15-' + (this.currentYear);
       t0.select(".area.alive").attr("d", this.areaRange([sixBack, sixForward]));
-      t0.select(".area.current").attr("d", this.areaRange([twoBack, twoForward]));
+
+
+      t0.select(".area.current")
+        .attr("d", this.areaRange([twoBack, twoForward]));
       // t0.select(".area.alive").attr("d", this.areaRange([this.rangeStart - 1, this.rangeStart + 1]));
       // t0.select(".area.alive").attr("d", this.areaRange([this.rangeStart, this.rangeEnd]));
+    }
+
+    public newCurrentYear = (newCurrentYear: number = -1, durationFactor: number = 1): void => {
+      // console.log('start ', this.yearStart, ' end ', this.yearEnd);
+      if (newCurrentYear > 0) {
+        this.currentYear = newCurrentYear;
+      }
+      var durationMs = 150 * durationFactor;
+
+      var twoBack = '10-15-' + (this.currentYear - 1);
+      var twoForward = '02-15-' + (this.currentYear);
+      var t0 = this.graphSvg.select(".area.current")
+        .transition().duration(durationMs)
+        .attr("d", this.areaRange([twoBack, twoForward]));
     }
   }
 }

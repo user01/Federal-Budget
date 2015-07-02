@@ -179,7 +179,7 @@ module Graph {
     }
 
     public RenderNewState = (): void => {
-      console.log('Desired: ', this.YearDesired, ' at ', this.Year);
+      // console.log('Desired: ', this.YearDesired, ' at ', this.Year);
       if (this.YearDesired > this.Year) {
         this.Year++;
       } else if (this.YearDesired < this.Year) {
