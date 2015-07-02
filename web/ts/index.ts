@@ -24,18 +24,22 @@ var onReady = (): void => {
   //startend.on('range', (newRange): void=> { console.log(newRange); });
 
   var newRangeHandler = (newRange): void=> {
-    spending.YearFrom = newRange.start;
-    spending.YearTo = newRange.end;
+    // spending.YearFrom = newRange.start;
+    spending.Year = newRange.end;
     yearFrom.textContent = newRange.start;
     yearTo.textContent = newRange.end;
     spending.RenderNewState();
+  }
+  
+  var newTargetYearHandler = (newYear): void => {
+    console.log('year!', newYear);
   }
 
   var spending: Graph.Spending;
   var dataAll = new Utility.DataAll('data');
   dataAll.on('data', (data: Utility.DataAll): void=> {
     console.log('data!', data);
-    spending = new Graph.Spending('graph-main', data.Sets);
+    spending = new Graph.Spending('graph-main', data);
     startend.on('range', newRangeHandler);
     startend.forceNewRange(1980, 2010);
     yearHead.SetRange(data.YearStart, data.YearEnd);

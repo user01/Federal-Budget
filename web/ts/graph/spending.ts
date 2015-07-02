@@ -22,25 +22,34 @@ module Graph {
     private radiusGdpScale: D3.Scale.LogScale;
     private elevationScale: D3.Scale.LinearScale;
 
-    private _yearTo: number = 0;
-    public get YearTo(): number {
-      return this._yearTo;
+    // private _yearTo: number = 0;
+    // public get YearTo(): number {
+    //   return this._yearTo;
+    // }
+    // public set YearTo(year: number) {
+    //   this._yearTo = Math.min(Math.max(this.data.Sets.budget.YearStart + 1, year), this.data.Sets.budget.YearEnd);
+    //   if (this._yearTo <= this._yearFrom) {
+    //     this._yearFrom = this._yearTo - 1;
+    //   }
+    // }
+    // private _yearFrom: number = 0;
+    // public get YearFrom(): number {
+    //   return this._yearFrom;
+    // }
+    // public set YearFrom(year: number) {
+    //   this._yearFrom = Math.min(Math.max(this.data.Sets.budget.YearStart, year), this.data.Sets.budget.YearEnd - 1);
+    //   if (this._yearTo <= this._yearFrom) {
+    //     this._yearTo = this._yearFrom + 1;
+    //   }
+    // }
+
+    private _year: number = 0;
+    public get Year(): number {
+      return this._year;
     }
-    public set YearTo(year: number) {
-      this._yearTo = Math.min(Math.max(this.data.budget.YearStart + 1, year), this.data.budget.YearEnd);
-      if (this._yearTo <= this._yearFrom) {
-        this._yearFrom = this._yearTo - 1;
-      }
-    }
-    private _yearFrom: number = 0;
-    public get YearFrom(): number {
-      return this._yearFrom;
-    }
-    public set YearFrom(year: number) {
-      this._yearFrom = Math.min(Math.max(this.data.budget.YearStart, year), this.data.budget.YearEnd - 1);
-      if (this._yearTo <= this._yearFrom) {
-        this._yearTo = this._yearFrom + 1;
-      }
+    public set Year(year: number) {
+      this._year = Math.min(this.data.YearEnd - 1,
+        Math.max(this.data.YearStart, year));
     }
 
     private _mode: SpendingMode = SpendingMode.Raw;
@@ -52,24 +61,23 @@ module Graph {
       return this._mode;
     }
     private get CpiFactorToCurrentYear(): number {
-      return this.cpiFactor(this.YearTo);
+      return this.cpiFactor(this.Year);
     }
 
     private _valueMaxRaw: number = 0;
     /** total fraction of GDP */
     private _valueMaxGdp: number = 0;
-    private _superfunctions: Array<string> = Spending.pluckUniqueSuperFunctions(this.data.budget.DataSet);
-    private _functions: Array<string> = Spending.pluckUniqueFunctions(this.data.budget.DataSet);
+    private _superfunctions: Array<string> = Spending.pluckUniqueSuperFunctions(this.data.Sets.budget.DataSet);
+    private _functions: Array<string> = Spending.pluckUniqueFunctions(this.data.Sets.budget.DataSet);
 
-    constructor(private id: string, private data: Utility.DataSets) {
+    constructor(private id: string, private data: Utility.DataAll) {
       super();
-      this._yearTo = this.data.budget.YearEnd;
-      this._yearFrom = this.data.budget.YearStart;
+      this.Year = this.data.Sets.budget.YearStart;
       
       
       
       // compute max values for all modes
-      //      this.valueMaxGdp = R.max(R.map(this.data.budget.DataSet))
+      //      this.valueMaxGdp = R.max(R.map(this.data.Sets.budget.DataSet))
       this.maxvalueRawCompute();
       this.maxvalueGDPCompute();
 
@@ -131,9 +139,9 @@ module Graph {
           .attr("cy", function(d) { return d.y; });
       });
 
-      this.data.budget.DataSet = R.mapIndexed(Spending.addKeysForD3)(this.data.budget.DataSet);
+      this.data.Sets.budget.DataSet = R.mapIndexed(Spending.addKeysForD3)(this.data.Sets.budget.DataSet);
 
-      this.force.nodes(this.data.budget.DataSet);
+      this.force.nodes(this.data.Sets.budget.DataSet);
       this.nodes = this.force.nodes();
 
       var self = this;
@@ -142,7 +150,7 @@ module Graph {
         .attr("class", "dots")
         .selectAll(".dot")
       //      .data(interpolateData(1800))
-        .data(data.budget.DataSet, Spending.key)
+        .data(data.Sets.budget.DataSet, Spending.key)
         .enter().append("circle")
         .attr("class", "dot")
         .style("stroke", 'black')
@@ -172,7 +180,7 @@ module Graph {
       
       this.elevationScale
         .range([this.height * 0.7, this.height * 0.5, this.height * 0.3])
-      this.data.budget.DataSet = R.mapIndexed(this.setCyForObj)(this.data.budget.DataSet);
+      this.data.Sets.budget.DataSet = R.mapIndexed(this.setCyForObj)(this.data.Sets.budget.DataSet);
 
       this.RenderNewState();
     }
@@ -182,17 +190,13 @@ module Graph {
 
       var dots = this.d3GraphElement
         .selectAll(".dot")
-        .data(this.data.budget.DataSet, Spending.key)
+        .data(this.data.Sets.budget.DataSet, Spending.key)
         .transition().duration(250)
         .style("stroke", (d) => { return this.color(this.deltaPercent(d)); })
         .attr("r", (d) => { return Math.max(0, this.radius(d) - 1); })
         .attr("cx", (d) => { return d.x; })
         .attr("cy", (d) => { return d.y; })
       this.force.start();
-      if (this._lastYearTo != this.YearTo) {
-        this.force.start();
-        this._lastYearTo = this.YearTo;
-      }
     }
 
     protected collectHeightWidth = (): void => {
@@ -226,33 +230,35 @@ module Graph {
     
     /** returns the *100 percent */
     private deltaPercent = (d: any): number => {
-      var valueTo = this.value(d, this.YearTo);
-      var valueFrom = this.value(d, this.YearFrom);
+      if (this.Year <= this.data.YearStart) return 0;
+      
+      var valueTo = this.value(d, this.Year);
+      var valueFrom = this.value(d, this.Year - 1);
       return (valueTo - valueFrom) / valueFrom * 100;
     }
 
     /** Compute the value of the node for the given year, considering the mode context */
-    private value = (d: any, yearIndex: number = this.YearTo): number => {
+    private value = (d: any, yearIndex: number = this.Year): number => {
       var val = d.data[this.yearToIndex(yearIndex)];
       switch (this._mode) {
         case SpendingMode.Raw:
           break;
         case SpendingMode.GDP:
           var inx = this.yearToIndex(yearIndex);
-          val = val / this.data.gdp.DataSet[inx];
+          val = val / this.data.Sets.gdp.DataSet[inx];
           break;
       }
       return Math.max(1e-5, val); //ensure non-zero values
     }
 
     private yearToIndex = (year: number): number => {
-      return Math.max(0, Math.floor(year) - this.data.budget.YearStart);
+      return Math.max(0, Math.floor(year) - this.data.Sets.budget.YearStart);
     }
 
     private maxvalueGDPCompute = (): number => {
-      var yearRange = R.range(this.data.budget.YearStart, this.data.budget.YearEnd + 1);
+      var yearRange = R.range(this.data.Sets.budget.YearStart, this.data.Sets.budget.YearEnd + 1);
       //compute the total for every year
-      var valuesArrays = R.pluck('data')(this.data.budget.DataSet);
+      var valuesArrays = R.pluck('data')(this.data.Sets.budget.DataSet);
       //console.log(valuesArrays);
       
       var valueAtYearIndex = R.pipe(this.yearToIndex, R.nth);
@@ -262,7 +268,7 @@ module Graph {
         var valueAtThisIndex = valueAtYearIndex(year);
         var valuesAtThisIndex = R.map(valueAtThisIndex)(valuesArrays);
         var total = R.sum(valuesAtThisIndex);
-        var gdpAtYear = this.data.gdp.DataSet[inx];
+        var gdpAtYear = this.data.Sets.gdp.DataSet[inx];
         return total / gdpAtYear;
       })(yearRange);
       this._valueMaxGdp = R.max(values); //in fraction of gdp
@@ -270,9 +276,9 @@ module Graph {
     }
 
     private maxvalueRawCompute = (): number => {
-      var yearRange = R.range(this.data.budget.YearStart, this.data.budget.YearEnd + 1);
+      var yearRange = R.range(this.data.Sets.budget.YearStart, this.data.Sets.budget.YearEnd + 1);
       //compute the total for every year
-      var valuesArrays = R.pluck('data')(this.data.budget.DataSet);
+      var valuesArrays = R.pluck('data')(this.data.Sets.budget.DataSet);
       //console.log(valuesArrays);
       
       var valueAtYearIndex = R.pipe(this.yearToIndex, R.nth);
@@ -294,7 +300,7 @@ module Graph {
       baseYear = Math.floor(baseYear);
       var targetIndex = this.yearToIndex(targetYear);
       var baseIndex = this.yearToIndex(baseYear);
-      return this.data.cpi.DataSet[targetIndex] / this.data.cpi.DataSet[baseIndex];
+      return this.data.Sets.cpi.DataSet[targetIndex] / this.data.Sets.cpi.DataSet[baseIndex];
     }
 
     // *******************************************************************
