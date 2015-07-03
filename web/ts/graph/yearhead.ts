@@ -78,6 +78,8 @@ module Graph {
       var fullYear = clickedDate.getFullYear();
       this.targetYear = fullYear;
 
+      this.targetYear = Math.max(Math.min(this.targetYear, this.yearEnd - 1), this.yearStart + 1);
+
       this.handleNewYear();
       this.runCallback('newTarget', this.targetYear);
     }
@@ -106,12 +108,11 @@ module Graph {
     }
 
     public handleNewYear = (newCurrentYear: number = -1,
-      newTargetYear:number = -1,
+      newTargetYear: number = -1,
       durationFactor: number = 1): void => {
+
       this.currentYear = (newCurrentYear > 0) ? newCurrentYear : this.currentYear;
-      this.targetYear = (newTargetYear > 0) ? newTargetYear : this.targetYear;
-      
-      
+
 
       var durationMs = 250 * durationFactor;
 
