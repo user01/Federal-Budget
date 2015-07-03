@@ -30,7 +30,7 @@ module Graph {
 
       this.d3GraphElement = d3.select("#" + this.id);
       this.collectHeightWidth();
-      this.targetYear = Math.floor((this.yearEnd - this.yearStart) / 2 + this.yearStart);
+      this.targetYear = this.yearEnd;
       this.currentYear = this.targetYear;
 
       this.xScale = d3.time.scale()
