@@ -118,7 +118,7 @@ module Graph {
 
       this.superFunctionsScale = d3.scale.linear()
         .domain([0, 1])
-        .range([0, this.height]);
+        .range([0, this.height - 11]);
 
       var perDiffRanges = [-5, 0, 5];
       this.color = d3.scale.linear()
@@ -195,21 +195,13 @@ module Graph {
         .data(this.superFunctionColor.domain().slice())
         .enter().append("g")
         .attr("class", "legend")
-        .attr("transform", (d, i) => {
-          var start = this.superIndexFractionStart(i);
-          console.log(start);
-          var pos = this.superFunctionsScale(start);
-          return "translate(" + 0 + "," + pos + ")";
-        });
+        .attr("transform", this.legendTransform);
 
       legend.append("rect")
         .attr("class", "blocks")
         .attr("x", this.width - 18)
         .attr("width", 18)
-        .attr("height", (d, i) => {
-          var size = this.superFunctionsScale(this.superIndexFractionSize(i));
-          return size;
-        })
+        .attr("height", this.blockHeight)
         .style("fill", this.superFunctionColor);
 
       legend.append("text")
@@ -218,9 +210,7 @@ module Graph {
         .attr("y", 9)
         .attr("dy", ".35em")
         .style("text-anchor", "end")
-        .text((d, i) => {
-          return (this._superfunctions[d] ? this._superfunctions[d] : '??');
-        });
+        .text(this.legendText);
 
       d3.select(window).on('resize.' + this.id, this.resize);
       this.resize();
@@ -235,6 +225,8 @@ module Graph {
 
       var radiusForAll = d3.min([this.width, this.height]);
       this.radiusRawScale.range([0, radiusForAll]); //reset ranges
+      this.superFunctionsScale
+        .range([0, this.height - 11]);
       
       this.elevationScale
         .range([this.height * 0.7, this.height * 0.5, this.height * 0.3])
@@ -275,24 +267,19 @@ module Graph {
       var legend = this.d3GraphElement.selectAll(".legend")
         .data(this.superFunctionColor.domain().slice())
         .transition().ease('linear').duration(150)
-        .attr("transform", (d, i) => {
-          var start = this.superIndexFractionStart(i);
-          console.log(start);
-          var pos = this.superFunctionsScale(start);
-          return "translate(" + 0 + "," + pos + ")";
-        });
+        .attr("transform", this.legendTransform);
 
       var blocks = this.d3GraphElement.selectAll(".blocks")
         .transition().ease('linear').duration(150)
-        .attr("height", (d, i) => {
-          var size = this.superFunctionsScale(this.superIndexFractionSize(i));
-          return size;
-        })
+        .attr("x", this.width - 18)
+        .attr("height", this.blockHeight)
         .style("fill", this.superFunctionColor);
 
       var blockText = this.d3GraphElement.selectAll(".blocks-text")
         .transition().ease('linear').duration(150)
         .attr("dy", ".35em")
+        .text(this.legendText)
+        .attr("x", this.width - 24);
     }
 
     protected collectHeightWidth = (): void => {
@@ -304,6 +291,22 @@ module Graph {
       //find the maxed sum of the current mode
       
     }
+
+    private legendTransform = (d, i) => {
+      var start = this.superIndexFractionStart(i);
+      // console.log(start);
+      var pos = this.superFunctionsScale(start);
+      return "translate(" + 0 + "," + pos + ")";
+    }
+    private blockHeight = (d, i) => {
+      var size = this.superFunctionsScale(this.superIndexFractionSize(i)) + 1;
+      return size;
+    }
+    private legendText = (d, i) => {
+      var size = this.superIndexFractionSize(i);
+      console.log(size);
+      return (this._superfunctions[d] && size > 0.05 ? this._superfunctions[d] : '');
+    };
     
 
     // *******************************************************************
