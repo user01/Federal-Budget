@@ -122,20 +122,20 @@ module Graph {
       ]);
       var tickCount = Math.max(Math.floor((this.width - 20) / 150), 1);
       var xAxis = d3.svg.axis()
-        .scale(this.xScale).orient("top")
+        .scale(this.xScale).orient("bottom")
         .tickPadding(4)
         .ticks(tickCount);
       // if no axis exists, create one, otherwise update it
       if (this.graphSvg.selectAll(".x.axis")[0].length < 1) {
         this.graphSvg.append("g")
           .attr("class", "x axis")
-          .attr("transform", "translate(0," + this.height + ")")
+          .attr("transform", "translate(0," + 0 + ")")
           .call(xAxis)
           .selectAll("text")
           .style("text-anchor", "start");
       } else {
         this.graphSvg.selectAll(".x.axis").transition().duration(durationMs)
-          .attr("transform", "translate(0," + this.height + ")")
+          .attr("transform", "translate(0," + 0 + ")")
           .call(xAxis)
           .selectAll("text")
           .style("text-anchor", "start");
