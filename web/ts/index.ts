@@ -18,6 +18,7 @@ var onReady = (): void => {
   var clearButtons = () => {
     btnRaw.classList.remove('pure-button-primary');
     btnGDP.classList.remove('pure-button-primary');
+    btnPerCap.classList.remove('pure-button-primary');
   }
 
   var newTargetYearHandler = (newYear): void => {
@@ -51,6 +52,12 @@ var onReady = (): void => {
       clearButtons();
       btnGDP.classList.add('pure-button-primary');
       spending.Mode = Graph.SpendingMode.GDP;
+      spending.RenderNewState();
+    }
+    btnPerCap.onclick = () => {
+      clearButtons();
+      btnPerCap.classList.add('pure-button-primary');
+      spending.Mode = Graph.SpendingMode.Capita;
       spending.RenderNewState();
     }
   });

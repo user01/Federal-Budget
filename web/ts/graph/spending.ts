@@ -5,7 +5,7 @@
 
 
 module Graph {
-  export enum SpendingMode { Raw, GDP };
+  export enum SpendingMode { Raw, GDP, Capita };
   export class Spending extends Utility.CbBase {
 
     protected d3GraphElement: D3._Selection<any>;
@@ -20,6 +20,7 @@ module Graph {
     private superFunctionColor: D3.Scale.OrdinalScale;
     private radiusRawScale: D3.Scale.LogScale;
     private radiusGdpScale: D3.Scale.LogScale;
+    private radiusCapitaScale: D3.Scale.LogScale;
     private elevationScale: D3.Scale.LinearScale;
 
 
@@ -59,6 +60,7 @@ module Graph {
     private _valueMaxRaw: number = 0;
     /** total fraction of GDP */
     private _valueMaxGdp: number = 0;
+    private _valueMaxCapita: number = 0;
     private _superfunctions: Array<string> = Spending.pluckUniqueSuperFunctions(this.data.Sets.budget.DataSet);
     private _functions: Array<string> = Spending.pluckUniqueFunctions(this.data.Sets.budget.DataSet);
 
@@ -73,6 +75,9 @@ module Graph {
       //      this.valueMaxGdp = R.max(R.map(this.data.Sets.budget.DataSet))
       this.maxvalueRawCompute();
       this.maxvalueGDPCompute();
+      this.maxvalueCapitaCompute();
+      console.log(this._valueMaxGdp);
+      console.log(this._valueMaxCapita);
 
       this.d3GraphElement = d3.select("#" + this.id);
       this.collectHeightWidth();
@@ -87,6 +92,10 @@ module Graph {
 
       this.radiusGdpScale = d3.scale.linear()
         .domain([1e-6, this._valueMaxGdp])
+        .range([0, radiusForAll]);
+      
+      this.radiusCapitaScale = d3.scale.linear()
+        .domain([1e-6, this._valueMaxCapita])
         .range([0, radiusForAll]);
 
       var perDiffRanges = [-5, 0, 5];
@@ -234,6 +243,9 @@ module Graph {
         case SpendingMode.GDP:
           rad = Math.max(0, this.radiusGdpScale(value));
           break;
+        case SpendingMode.Capita:
+          rad = Math.max(0, this.radiusCapitaScale(value));
+          break;
       }
       d.radius = rad;
       return d.radius;
@@ -257,6 +269,10 @@ module Graph {
         case SpendingMode.GDP:
           var inx = this.yearToIndex(yearIndex);
           val = val / this.data.Sets.gdp.DataSet[inx];
+          break;
+        case SpendingMode.Capita:
+          var inx = this.yearToIndex(yearIndex);
+          val = val / this.data.Sets.population.DataSet[inx];
           break;
       }
       return Math.max(1e-5, val); //ensure non-zero values
@@ -284,6 +300,26 @@ module Graph {
       })(yearRange);
       this._valueMaxGdp = R.max(values); //in fraction of gdp
       return this._valueMaxGdp;
+    }
+
+    private maxvalueCapitaCompute = (): number => {
+      var yearRange = R.range(this.data.Sets.budget.YearStart, this.data.Sets.budget.YearEnd + 1);
+      //compute the total for every year
+      var valuesArrays = R.pluck('data')(this.data.Sets.budget.DataSet);
+      //console.log(valuesArrays);
+      
+      var valueAtYearIndex = R.pipe(this.yearToIndex, R.nth);
+
+      var values = R.map((year: number): number => {
+        var inx = this.yearToIndex(year);
+        var valueAtThisIndex = valueAtYearIndex(year);
+        var valuesAtThisIndex = R.map(valueAtThisIndex)(valuesArrays);
+        var total = R.sum(valuesAtThisIndex);
+        var popAtYear = this.data.Sets.population.DataSet[inx];
+        return total / popAtYear;
+      })(yearRange);
+      this._valueMaxCapita = R.max(values); //in dollars per person
+      return this._valueMaxCapita;
     }
 
     private maxvalueRawCompute = (): number => {
@@ -349,6 +385,10 @@ module Graph {
         case SpendingMode.GDP:
           var oute = Math.floor(value * 10000) / 100;
           valueField.text(oute + '%');
+          break;
+        case SpendingMode.Capita:
+          var oute = Math.floor(value);
+          valueField.text('$ ' + oute);
           break;
         default:
           valueField.text('Unknown mode');
