@@ -40,7 +40,7 @@ var onReady = (): void => {
     R.forEach(function(btnKey) {
       var btn = btns[btnKey].elm;
       btn.classList.remove('pure-button-primary');
-      btn.classList.add('button-secondary');
+      // btn.classList.add('button-secondary');
     })(btnKeys);
   }
 
@@ -71,7 +71,7 @@ var onReady = (): void => {
       var enu = btns[btnKey].enum;
       btn.onclick = () => {
         clearButtons();
-        btn.classList.remove('button-secondary');
+        // btn.classList.remove('button-secondary');
         btn.classList.add('pure-button-primary');
         spending.Mode = enu;
         spending.RenderNewState();
