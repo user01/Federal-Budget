@@ -232,10 +232,10 @@ module Graph {
         .range([this.height * 0.7, this.height * 0.5, this.height * 0.3])
       this.data.Sets.budget.DataSet = R.mapIndexed(this.setCyForObj)(this.data.Sets.budget.DataSet);
 
-      this.RenderNewState();
+      this.RenderNewState(0);
     }
 
-    public RenderNewState = (): void => {
+    public RenderNewState = (delayFactor:number=1): void => {
       // console.log('Desired: ', this.YearDesired, ' at ', this.Year);
       if (this.YearDesired > this.Year) {
         this.Year++;
@@ -246,7 +246,7 @@ module Graph {
       var dots = this.d3GraphElement
         .selectAll(".dot")
         .data(this.data.Sets.budget.DataSet, Spending.key)
-        .transition().ease('linear').duration(150)
+        .transition().ease('linear').duration(150 * delayFactor)
         .style("stroke", (d) => { return this.color(this.deltaPercent(d)); })
         .attr("r", (d) => { return Math.max(0, this.radius(d) - 1); })
       // .attr("cx", (d) => { return d.x; })
@@ -266,17 +266,17 @@ module Graph {
 
       var legend = this.d3GraphElement.selectAll(".legend")
         .data(this.superFunctionColor.domain().slice())
-        .transition().ease('linear').duration(150)
+        .transition().ease('linear').duration(150 * delayFactor)
         .attr("transform", this.legendTransform);
 
       var blocks = this.d3GraphElement.selectAll(".blocks")
-        .transition().ease('linear').duration(150)
+        .transition().ease('linear').duration(150 * delayFactor)
         .attr("x", this.width - 18)
         .attr("height", this.blockHeight)
         .style("fill", this.superFunctionColor);
 
       var blockText = this.d3GraphElement.selectAll(".blocks-text")
-        .transition().ease('linear').duration(150)
+        .transition().ease('linear').duration(150 * delayFactor)
         .attr("dy", ".35em")
         .text(this.legendText)
         .attr("x", this.width - 24);
