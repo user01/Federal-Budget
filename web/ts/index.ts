@@ -4,6 +4,7 @@
 
 
 declare var R: any;
+declare var setPath: string;
 var onReady = (): void => {
 
   var yearFrom = document.getElementById('year-from');
@@ -14,11 +15,14 @@ var onReady = (): void => {
   var btnGDP = document.getElementById('correction-ofgdp');
   var btnPerCap = document.getElementById('correction-percaptia');
   var yearHead = new Graph.YearHead('graph-timeline-header');
-  
+
   var clearButtons = () => {
     btnRaw.classList.remove('pure-button-primary');
     btnGDP.classList.remove('pure-button-primary');
     btnPerCap.classList.remove('pure-button-primary');
+    btnRaw.classList.add('button-secondary');
+    btnGDP.classList.add('button-secondary');
+    btnPerCap.classList.add('button-secondary');
   }
 
   var newTargetYearHandler = (newYear): void => {
@@ -26,8 +30,9 @@ var onReady = (): void => {
     spending.YearDesired = newYear;
   }
 
+  var path = (typeof setPath != 'undefined') ? setPath : 'data';
   var spending: Graph.Spending;
-  var dataAll = new Utility.DataAll('data');
+  var dataAll = new Utility.DataAll(path);
   dataAll.on('data', (data: Utility.DataAll): void=> {
     // console.log('data!', data);
     spending = new Graph.Spending('graph-main', data);
@@ -44,18 +49,21 @@ var onReady = (): void => {
 
     btnRaw.onclick = () => {
       clearButtons();
+      btnRaw.classList.remove('button-secondary');
       btnRaw.classList.add('pure-button-primary');
       spending.Mode = Graph.SpendingMode.Raw;
       spending.RenderNewState();
     }
     btnGDP.onclick = () => {
       clearButtons();
+      btnGDP.classList.remove('button-secondary');
       btnGDP.classList.add('pure-button-primary');
       spending.Mode = Graph.SpendingMode.GDP;
       spending.RenderNewState();
     }
     btnPerCap.onclick = () => {
       clearButtons();
+      btnPerCap.classList.remove('button-secondary');
       btnPerCap.classList.add('pure-button-primary');
       spending.Mode = Graph.SpendingMode.Capita;
       spending.RenderNewState();
