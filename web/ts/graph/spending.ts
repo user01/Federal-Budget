@@ -181,7 +181,7 @@ module Graph {
       this.collectHeightWidth();
       this.backdrop.attr("width", this.width)
         .attr("height", this.height);
-
+      this.force.size([this.width, this.height]);
 
       var radiusForAll = d3.min([this.width, this.height]);
       this.radiusRawScale.range([0, radiusForAll]); //reset ranges
@@ -412,7 +412,7 @@ module Graph {
 
     private tooltipMouseMove = (d: any): void => {
       if (!d3.event) return;
-      
+
       var xPosition = d3.event.x;
       var yPosition = d3.event.y;
 
