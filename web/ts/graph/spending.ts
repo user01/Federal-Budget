@@ -199,10 +199,11 @@ module Graph {
           var start = this.superIndexFractionStart(i);
           console.log(start);
           var pos = this.superFunctionsScale(start);
-          return "translate(" + 0 +"," + pos + ")";
+          return "translate(" + 0 + "," + pos + ")";
         });
 
       legend.append("rect")
+        .attr("class", "blocks")
         .attr("x", this.width - 18)
         .attr("width", 18)
         .attr("height", (d, i) => {
@@ -212,11 +213,12 @@ module Graph {
         .style("fill", this.superFunctionColor);
 
       legend.append("text")
+        .attr("class", "blocks-text")
         .attr("x", this.width - 24)
         .attr("y", 9)
         .attr("dy", ".35em")
         .style("text-anchor", "end")
-        .text((d,i) => {
+        .text((d, i) => {
           return (this._superfunctions[d] ? this._superfunctions[d] : '??');
         });
 
@@ -269,6 +271,28 @@ module Graph {
         this.tooltipUpdate();
       }
 
+
+      var legend = this.d3GraphElement.selectAll(".legend")
+        .data(this.superFunctionColor.domain().slice())
+        .transition().ease('linear').duration(150)
+        .attr("transform", (d, i) => {
+          var start = this.superIndexFractionStart(i);
+          console.log(start);
+          var pos = this.superFunctionsScale(start);
+          return "translate(" + 0 + "," + pos + ")";
+        });
+
+      var blocks = this.d3GraphElement.selectAll(".blocks")
+        .transition().ease('linear').duration(150)
+        .attr("height", (d, i) => {
+          var size = this.superFunctionsScale(this.superIndexFractionSize(i));
+          return size;
+        })
+        .style("fill", this.superFunctionColor);
+
+      var blockText = this.d3GraphElement.selectAll(".blocks-text")
+        .transition().ease('linear').duration(150)
+        .attr("dy", ".35em")
     }
 
     protected collectHeightWidth = (): void => {
@@ -347,7 +371,7 @@ module Graph {
     private superIndexFractionSize(index: number, yearIndex: number = this.Year): number {
       var inx = this.yearToIndex(yearIndex);
       var value = this._superFractionsVsYear[index][inx];
-      return Math.max(0,value);
+      return Math.max(0, value);
     }
 
     private superIndexFractionStart(index: number, yearIndex: number = this.Year): number {
@@ -356,12 +380,12 @@ module Graph {
       if (index > this._superFractionsVsYear.length) return 1;
       var inx = this.yearToIndex(yearIndex);
       // var reduceIndexed = R.addIndex(R.reduce)
-      var start = R.reduceIndexed((accum: number, fraction: number, inxInner:number): number=> {
+      var start = R.reduceIndexed((accum: number, fraction: number, inxInner: number): number=> {
         return accum + ((inxInner < index) ? fraction[inx] : 0);
       })(0)(this._superFractionsVsYear);
-      return Math.max(0,start);
+      return Math.max(0, start);
     }
-    
+
     private maxvalueGDPCompute = (): number => {
       var yearRange = R.range(this.data.Sets.budget.YearStart, this.data.Sets.budget.YearEnd + 1);
       //compute the total for every year
