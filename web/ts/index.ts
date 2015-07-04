@@ -1,4 +1,3 @@
-/// <reference path="graph/startend.ts" />
 /// <reference path="graph/yearhead.ts" />
 /// <reference path="graph/spending.ts" />
 /// <reference path="utility/data.all.ts" />
