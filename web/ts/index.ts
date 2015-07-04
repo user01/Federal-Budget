@@ -30,7 +30,7 @@ var onReady = (): void => {
     },
     realpercap: {
       elm: document.getElementById('correction-realpercaptia'),
-      enum: Graph.SpendingMode.Real
+      enum: Graph.SpendingMode.RealCapita
     }
   };
   var btnKeys = R.keys(btns);
