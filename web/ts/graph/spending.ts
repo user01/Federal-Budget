@@ -93,7 +93,7 @@ module Graph {
       this.radiusGdpScale = d3.scale.linear()
         .domain([1e-6, this._valueMaxGdp])
         .range([0, radiusForAll]);
-      
+
       this.radiusCapitaScale = d3.scale.linear()
         .domain([1e-6, this._valueMaxCapita])
         .range([0, radiusForAll]);
@@ -217,6 +217,10 @@ module Graph {
           this.RenderNewState();
         });
       this.force.start();
+      if (this._tooltipData) {
+        this.tooltipUpdate();
+      }
+
     }
 
     protected collectHeightWidth = (): void => {
@@ -354,8 +358,16 @@ module Graph {
     // Tooltips
     // *******************************************************************
     private hoverTooltip: D3._Selection<any>;
+    private _tooltipData: any = null;
 
     private tooltipMouseOver = (d: any): void => {
+      this._tooltipData = R.clone(d);
+      this.tooltipUpdate();
+      //Show the tooltip
+      this.hoverTooltip.classed("hidden", false);
+    }
+
+    private tooltipUpdate = (d: any = this._tooltipData): void => {
       //Update the tooltip position and value
       this.hoverTooltip
         .select("#super")
@@ -396,11 +408,11 @@ module Graph {
       }
 
       this.tooltipMouseMove(d);
-      
-      //Show the tooltip
-      this.hoverTooltip.classed("hidden", false);
     }
+
     private tooltipMouseMove = (d: any): void => {
+      if (!d3.event) return;
+      
       var xPosition = d3.event.x;
       var yPosition = d3.event.y;
 
@@ -410,6 +422,7 @@ module Graph {
         .style("top", yPosition + "px")
     }
     private tooltipMouseOut = (d: any): void => {
+      this._tooltipData = null;
       this.hoverTooltip.classed("hidden", true);
     }
     private setCyForObj = (d: any, idx: number): any => {
