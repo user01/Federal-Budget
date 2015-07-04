@@ -93,7 +93,7 @@ module Graph {
       this.graphSvg
         .attr("width", this.width + this.marginPx * 2)
         .attr("height", this.height + this.marginPx * 2)
-      this.handleNewYear(-1, 0);
+      this.handleNewYear(-1, 0, 0);
     }
 
     protected collectHeightWidth = (): void => {
