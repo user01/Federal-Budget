@@ -24,6 +24,7 @@ module Graph {
     private radiusRealScale: D3.Scale.LogScale;
     private radiusRealCapitaScale: D3.Scale.LogScale;
     private elevationScale: D3.Scale.LinearScale;
+    private superFunctionsScale: D3.Scale.LinearScale;
 
 
     private _year: number = 0;
@@ -73,7 +74,7 @@ module Graph {
       this.Year = this.data.Sets.budget.YearEnd;
       this.YearDesired = this.Year;
 
-      console.log(data);
+      // console.log(data);
       
       // compute max values for all modes
       //      this.valueMaxGdp = R.max(R.map(this.data.Sets.budget.DataSet))
@@ -84,12 +85,15 @@ module Graph {
       this.maxvalueRealCapitaCompute();
       // console.log(this._valueMaxGdp);
       // console.log(this._valueMaxCapita);
+      
+      this.superFractionCompute();
+      // console.log(this._superFractionsVsYear);
 
       this.d3GraphElement = d3.select("#" + this.id);
       this.collectHeightWidth();
 
 
-      // var fractionsOfBudget = [];
+      var fractionsOfBudget = [];
 
       var radiusForAll = d3.min([this.width, this.height]);
       this.radiusRawScale = d3.scale.linear()
@@ -111,6 +115,10 @@ module Graph {
       this.radiusRealCapitaScale = d3.scale.linear()
         .domain([1e-6, this._valueMaxRealCapita])
         .range([0, radiusForAll]);
+
+      this.superFunctionsScale = d3.scale.linear()
+        .domain([0, 1])
+        .range([0, this.height]);
 
       var perDiffRanges = [-5, 0, 5];
       this.color = d3.scale.linear()
@@ -182,9 +190,35 @@ module Graph {
         .on("mouseout", this.tooltipMouseOut)
         .call(this.force.drag)
 
-      var chunkedStack = this.d3GraphElement.append("g")
-        .attr("class", "stacks")
-        .selectAll(".stack")
+
+      var legend = this.d3GraphElement.selectAll(".legend")
+        .data(this.superFunctionColor.domain().slice())
+        .enter().append("g")
+        .attr("class", "legend")
+        .attr("transform", (d, i) => {
+          var start = this.superIndexFractionStart(i);
+          console.log(start);
+          var pos = this.superFunctionsScale(start);
+          return "translate(" + 0 +"," + pos + ")";
+        });
+
+      legend.append("rect")
+        .attr("x", this.width - 18)
+        .attr("width", 18)
+        .attr("height", (d, i) => {
+          var size = this.superFunctionsScale(this.superIndexFractionSize(i));
+          return size;
+        })
+        .style("fill", this.superFunctionColor);
+
+      legend.append("text")
+        .attr("x", this.width - 24)
+        .attr("y", 9)
+        .attr("dy", ".35em")
+        .style("text-anchor", "end")
+        .text((d,i) => {
+          return (this._superfunctions[d] ? this._superfunctions[d] : '??');
+        });
 
       d3.select(window).on('resize.' + this.id, this.resize);
       this.resize();
@@ -286,8 +320,8 @@ module Graph {
 
     /** Compute the value of the node for the given year, considering the mode context */
     private value = (d: any, yearIndex: number = this.Year): number => {
-      var val = d.data[this.yearToIndex(yearIndex)];
       var inx = this.yearToIndex(yearIndex);
+      var val = d.data[inx];
       switch (this._mode) {
         case SpendingMode.Raw:
           break;
@@ -310,6 +344,24 @@ module Graph {
       return Math.max(0, Math.floor(year) - this.data.Sets.budget.YearStart);
     }
 
+    private superIndexFractionSize(index: number, yearIndex: number = this.Year): number {
+      var inx = this.yearToIndex(yearIndex);
+      var value = this._superFractionsVsYear[index][inx];
+      return Math.max(0,value);
+    }
+
+    private superIndexFractionStart(index: number, yearIndex: number = this.Year): number {
+      // debugger;
+      if (index <= 0) return 0;
+      if (index > this._superFractionsVsYear.length) return 1;
+      var inx = this.yearToIndex(yearIndex);
+      // var reduceIndexed = R.addIndex(R.reduce)
+      var start = R.reduceIndexed((accum: number, fraction: number, inxInner:number): number=> {
+        return accum + ((inxInner < index) ? fraction[inx] : 0);
+      })(0)(this._superFractionsVsYear);
+      return Math.max(0,start);
+    }
+    
     private maxvalueGDPCompute = (): number => {
       var yearRange = R.range(this.data.Sets.budget.YearStart, this.data.Sets.budget.YearEnd + 1);
       //compute the total for every year
@@ -348,6 +400,46 @@ module Graph {
       })(yearRange);
       this._valueMaxCapita = R.max(values); //in dollars per person
       return this._valueMaxCapita;
+    }
+
+    private _superFractionsVsYear: Array<any>;
+    private superFractionCompute = (): Array<any> => {
+      var yearRange = R.range(this.data.Sets.budget.YearStart, this.data.Sets.budget.YearEnd + 1);
+      var valueAtYearIndex = R.pipe(this.yearToIndex, R.nth);
+
+      var valuesArrays = R.pluck('data')(this.data.Sets.budget.DataSet);
+      var totalsValues = R.map((year: number): number => {
+        var inx = this.yearToIndex(year);
+        var valueAtThisIndex = valueAtYearIndex(year);
+        var valuesAtThisIndex = R.map(valueAtThisIndex)(valuesArrays);
+        var total = R.sum(valuesAtThisIndex);
+        return total;
+      })(yearRange);
+
+      this._superFractionsVsYear = R.map((superFunction: string): any=> {
+        
+        //compute the total for every year
+        var valuesArrays = R.pipe(
+          R.filter((d): boolean=> {
+            return d.sp == superFunction;
+          }),
+          R.pluck('data')
+          )(this.data.Sets.budget.DataSet);
+        //console.log(valuesArrays);
+        
+  
+        var valueList = R.map((year: number): number => {
+          var inx = this.yearToIndex(year);
+          var valueAtThisIndex = valueAtYearIndex(year);
+          var valuesAtThisIndex = R.map(valueAtThisIndex)(valuesArrays);
+          var total = R.sum(valuesAtThisIndex);
+          return total / totalsValues[inx];
+        })(yearRange);
+        return valueList;
+
+      })(this._superfunctions);
+
+      return this._superFractionsVsYear;
     }
 
     private maxvalueRawCompute = (): number => {
