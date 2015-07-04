@@ -39,7 +39,7 @@ module Utility {
       if (!DataAll.allReadySets(R.values(this.Sets))) return;
       this._yearStart = R.pipe(R.values, R.map(R.prop('YearStart')), R.max)(this.Sets);
       this._yearEnd = R.pipe(R.values, R.map(R.prop('YearEnd')), R.min)(this.Sets);
-      console.log('Data from ', this._yearStart, ' to ', this._yearEnd);
+      // console.log('Data from ', this._yearStart, ' to ', this._yearEnd);
       var sets = R.mapObj((ds: DataSet): DataSet => {
         return ds.CullData(this._yearStart, this._yearEnd);
       })(this.Sets);

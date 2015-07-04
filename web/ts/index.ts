@@ -22,7 +22,7 @@ var onReady = (): void => {
   }
 
   var newTargetYearHandler = (newYear): void => {
-    console.log('year!', newYear);
+    // console.log('year!', newYear);
     spending.YearDesired = newYear;
   }
 

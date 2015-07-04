@@ -22,12 +22,12 @@ module Utility {
 
     public CullData = (yearStart: number, yearEnd: number): DataSet => {
       //This has to do this for All data lists
-      console.log('From ', this._yearStart, '-', this._yearEnd);
-      console.log('To ', yearStart, '-', yearEnd);
+      // console.log('From ', this._yearStart, '-', this._yearEnd);
+      // console.log('To ', yearStart, '-', yearEnd);
       var sliceFrontCount = Math.max(0, yearStart - this._yearEnd);
       var indexesToRetain = yearEnd - yearStart + 1;
       var indexesToRemove = Math.max(0, this._yearEnd - yearEnd);
-      console.log(sliceFrontCount, indexesToRetain, indexesToRemove);
+      // console.log(sliceFrontCount, indexesToRetain, indexesToRemove);
       var handleValue = (value: any): any => {
         if (!R.isArrayLike(value)) return value;
         value.splice(0, sliceFrontCount);

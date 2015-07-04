@@ -78,6 +78,8 @@ module Graph {
       this.collectHeightWidth();
 
 
+      var fractionsOfBudget = [];
+
       var radiusForAll = d3.min([this.width, this.height]);
       this.radiusRawScale = d3.scale.linear()
         .domain([1e-6, this._valueMaxRaw])
@@ -157,6 +159,10 @@ module Graph {
         .on("mouseout", this.tooltipMouseOut)
         .call(this.force.drag)
 
+      var chunkedStack = this.d3GraphElement.append("g")
+        .attr("class", "stacks")
+        .selectAll(".stack")
+
       d3.select(window).on('resize.' + this.id, this.resize);
       this.resize();
     }
@@ -192,8 +198,8 @@ module Graph {
         .transition().ease('linear').duration(150)
         .style("stroke", (d) => { return this.color(this.deltaPercent(d)); })
         .attr("r", (d) => { return Math.max(0, this.radius(d) - 1); })
-        // .attr("cx", (d) => { return d.x; })
-        // .attr("cy", (d) => { return d.y; })
+      // .attr("cx", (d) => { return d.x; })
+      // .attr("cy", (d) => { return d.y; })
         .call(Spending.endall, () => {
           this.runCallback('renderedYear', this.Year);
           if (this.YearDesired == this.Year) {
