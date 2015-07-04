@@ -15,6 +15,11 @@ var onReady = (): void => {
   var btnGDP = document.getElementById('correction-ofgdp');
   var btnPerCap = document.getElementById('correction-percaptia');
   var yearHead = new Graph.YearHead('graph-timeline-header');
+  
+  var clearButtons = () => {
+    btnRaw.classList.remove('pure-button-primary');
+    btnGDP.classList.remove('pure-button-primary');
+  }
 
   var newTargetYearHandler = (newYear): void => {
     console.log('year!', newYear);
@@ -38,10 +43,14 @@ var onReady = (): void => {
     });
 
     btnRaw.onclick = () => {
+      clearButtons();
+      btnRaw.classList.add('pure-button-primary');
       spending.Mode = Graph.SpendingMode.Raw;
       spending.RenderNewState();
     }
     btnGDP.onclick = () => {
+      clearButtons();
+      btnGDP.classList.add('pure-button-primary');
       spending.Mode = Graph.SpendingMode.GDP;
       spending.RenderNewState();
     }
