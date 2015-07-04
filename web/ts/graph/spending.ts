@@ -76,14 +76,14 @@ module Graph {
       this.maxvalueRawCompute();
       this.maxvalueGDPCompute();
       this.maxvalueCapitaCompute();
-      console.log(this._valueMaxGdp);
-      console.log(this._valueMaxCapita);
+      // console.log(this._valueMaxGdp);
+      // console.log(this._valueMaxCapita);
 
       this.d3GraphElement = d3.select("#" + this.id);
       this.collectHeightWidth();
 
 
-      var fractionsOfBudget = [];
+      // var fractionsOfBudget = [];
 
       var radiusForAll = d3.min([this.width, this.height]);
       this.radiusRawScale = d3.scale.linear()
