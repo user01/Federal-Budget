@@ -5,7 +5,7 @@
 
 
 module Graph {
-  export enum SpendingMode { Raw, GDP, Capita };
+  export enum SpendingMode { Raw, GDP, Capita, Real };
   export class Spending extends Utility.CbBase {
 
     protected d3GraphElement: D3._Selection<any>;
@@ -21,6 +21,7 @@ module Graph {
     private radiusRawScale: D3.Scale.LogScale;
     private radiusGdpScale: D3.Scale.LogScale;
     private radiusCapitaScale: D3.Scale.LogScale;
+    private radiusRealScale: D3.Scale.LogScale;
     private elevationScale: D3.Scale.LinearScale;
 
 
@@ -61,6 +62,7 @@ module Graph {
     /** total fraction of GDP */
     private _valueMaxGdp: number = 0;
     private _valueMaxCapita: number = 0;
+    private _valueMaxReal: number = 0;
     private _superfunctions: Array<string> = Spending.pluckUniqueSuperFunctions(this.data.Sets.budget.DataSet);
     private _functions: Array<string> = Spending.pluckUniqueFunctions(this.data.Sets.budget.DataSet);
 
@@ -69,13 +71,14 @@ module Graph {
       this.Year = this.data.Sets.budget.YearEnd;
       this.YearDesired = this.Year;
       
-      
+      console.log(data);
       
       // compute max values for all modes
       //      this.valueMaxGdp = R.max(R.map(this.data.Sets.budget.DataSet))
       this.maxvalueRawCompute();
       this.maxvalueGDPCompute();
       this.maxvalueCapitaCompute();
+      this.maxvalueRealCompute();
       // console.log(this._valueMaxGdp);
       // console.log(this._valueMaxCapita);
 
@@ -96,6 +99,10 @@ module Graph {
 
       this.radiusCapitaScale = d3.scale.linear()
         .domain([1e-6, this._valueMaxCapita])
+        .range([0, radiusForAll]);
+
+      this.radiusRealScale = d3.scale.linear()
+        .domain([1e-6, this._valueMaxReal])
         .range([0, radiusForAll]);
 
       var perDiffRanges = [-5, 0, 5];
@@ -267,16 +274,18 @@ module Graph {
     /** Compute the value of the node for the given year, considering the mode context */
     private value = (d: any, yearIndex: number = this.Year): number => {
       var val = d.data[this.yearToIndex(yearIndex)];
+      var inx = this.yearToIndex(yearIndex);
       switch (this._mode) {
         case SpendingMode.Raw:
           break;
         case SpendingMode.GDP:
-          var inx = this.yearToIndex(yearIndex);
           val = val / this.data.Sets.gdp.DataSet[inx];
           break;
         case SpendingMode.Capita:
-          var inx = this.yearToIndex(yearIndex);
           val = val / this.data.Sets.population.DataSet[inx];
+          break;
+        case SpendingMode.Real:
+          val = val / this.data.Sets.cpi.DataSet[inx];
           break;
       }
       return Math.max(1e-5, val); //ensure non-zero values
@@ -345,6 +354,26 @@ module Graph {
       return this._valueMaxRaw;
     }
     
+    private maxvalueRealCompute = (): number => {
+      var yearRange = R.range(this.data.Sets.budget.YearStart, this.data.Sets.budget.YearEnd + 1);
+      //compute the total for every year
+      var valuesArrays = R.pluck('data')(this.data.Sets.budget.DataSet);
+      //console.log(valuesArrays);
+      
+      var valueAtYearIndex = R.pipe(this.yearToIndex, R.nth);
+
+      var values = R.map((year: number): number => {
+        var inx = this.yearToIndex(year);
+        var valueAtThisIndex = valueAtYearIndex(year);
+        var valuesAtThisIndex = R.map(valueAtThisIndex)(valuesArrays);
+        var total = R.sum(valuesAtThisIndex);
+        var fractionalValueOf2014DollarAtYear = this.data.Sets.cpi.DataSet[inx];
+        return total / fractionalValueOf2014DollarAtYear;
+      })(yearRange);
+      this._valueMaxReal = R.max(values); //in fraction of gdp
+      return this._valueMaxReal;
+    }
+
     /** This factor times the dollar value in target year put it in base year (2014) dollars */
     private cpiFactor = (targetYear: number, baseYear: number = 2014) => {
       targetYear = Math.floor(targetYear);

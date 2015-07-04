@@ -11,18 +11,37 @@ var onReady = (): void => {
   var yearTo = document.getElementById('year-to');
 
 
-  var btnRaw = document.getElementById('correction-raw');
-  var btnGDP = document.getElementById('correction-ofgdp');
-  var btnPerCap = document.getElementById('correction-percaptia');
+  var btns = {
+    raw: {
+      elm: document.getElementById('correction-raw'),
+      enum: Graph.SpendingMode.Raw
+    },
+    gdp: {
+      elm: document.getElementById('correction-ofgdp'),
+      enum: Graph.SpendingMode.GDP
+    },
+    percap: {
+      elm: document.getElementById('correction-percaptia'),
+      enum: Graph.SpendingMode.Capita
+    },
+    real: {
+      elm: document.getElementById('correction-real'),
+      enum: Graph.SpendingMode.Real
+    },
+    realpercap: {
+      elm: document.getElementById('correction-realpercaptia'),
+      enum: Graph.SpendingMode.Real
+    }
+  };
+  var btnKeys = R.keys(btns);
   var yearHead = new Graph.YearHead('graph-timeline-header');
 
   var clearButtons = () => {
-    btnRaw.classList.remove('pure-button-primary');
-    btnGDP.classList.remove('pure-button-primary');
-    btnPerCap.classList.remove('pure-button-primary');
-    btnRaw.classList.add('button-secondary');
-    btnGDP.classList.add('button-secondary');
-    btnPerCap.classList.add('button-secondary');
+    R.forEach(function(btnKey) {
+      var btn = btns[btnKey].elm;
+      btn.classList.remove('pure-button-primary');
+      btn.classList.add('button-secondary');
+    })(btnKeys);
   }
 
   var newTargetYearHandler = (newYear): void => {
@@ -47,27 +66,18 @@ var onReady = (): void => {
       yearHead.newCurrentYear(year);
     });
 
-    btnRaw.onclick = () => {
-      clearButtons();
-      btnRaw.classList.remove('button-secondary');
-      btnRaw.classList.add('pure-button-primary');
-      spending.Mode = Graph.SpendingMode.Raw;
-      spending.RenderNewState();
-    }
-    btnGDP.onclick = () => {
-      clearButtons();
-      btnGDP.classList.remove('button-secondary');
-      btnGDP.classList.add('pure-button-primary');
-      spending.Mode = Graph.SpendingMode.GDP;
-      spending.RenderNewState();
-    }
-    btnPerCap.onclick = () => {
-      clearButtons();
-      btnPerCap.classList.remove('button-secondary');
-      btnPerCap.classList.add('pure-button-primary');
-      spending.Mode = Graph.SpendingMode.Capita;
-      spending.RenderNewState();
-    }
+    R.forEach(function(btnKey) {
+      var btn = btns[btnKey].elm;
+      var enu = btns[btnKey].enum;
+      btn.onclick = () => {
+        clearButtons();
+        btn.classList.remove('button-secondary');
+        btn.classList.add('pure-button-primary');
+        spending.Mode = enu;
+        spending.RenderNewState();
+      }
+    })(btnKeys);
+
   });
   dataAll.Initialize();
 }
