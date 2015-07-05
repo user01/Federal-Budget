@@ -199,14 +199,14 @@ module Graph {
 
       legend.append("rect")
         .attr("class", "blocks")
-        .attr("x", this.width - 18)
-        .attr("width", 18)
+        .attr("x", this.width - this.legendWidth())
+        .attr("width", this.legendWidth())
         .attr("height", this.blockHeight)
         .style("fill", this.superFunctionColor);
 
       legend.append("text")
         .attr("class", "blocks-text")
-        .attr("x", this.width - 24)
+        .attr("x", this.width - this.legendWidth() - 6)
         .attr("y", this.legendTextY)
         .attr("dy", ".35em")
         .style("text-anchor", "end")
@@ -271,7 +271,7 @@ module Graph {
 
       var blocks = this.d3GraphElement.selectAll(".blocks")
         .transition().ease('linear').duration(150 * delayFactor)
-        .attr("x", this.width - 18)
+        .attr("x", this.width - this.legendWidth())
         .attr("height", this.blockHeight)
         .style("fill", this.superFunctionColor);
 
@@ -279,7 +279,7 @@ module Graph {
         .transition().ease('linear').duration(150 * delayFactor)
         .attr("y", this.legendTextY)
         .text(this.legendText)
-        .attr("x", this.width - 24);
+        .attr("x", this.width - this.legendWidth() - 6);
     }
 
     protected collectHeightWidth = (): void => {
@@ -310,6 +310,9 @@ module Graph {
     private legendTextY = (d, i) => {
       return this.superFunctionsScale(this.superIndexFractionSize(i)) / 2;
     };
+    private legendWidth(): number {
+      return Math.floor(this.width * 0.03);
+    }
     
 
     // *******************************************************************
