@@ -270,6 +270,7 @@ module Graph {
       var blocks = this.d3GraphElement.selectAll(".blocks")
         .transition().ease('linear').duration(150 * delayFactor)
         .attr("x", this.width - this.legendWidth())
+        .attr("width", this.legendWidth())
         .attr("height", this.blockHeight)
         .style("fill", this.superFunctionColor);
 
