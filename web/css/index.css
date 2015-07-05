@@ -98,6 +98,9 @@ rect.backdrop {
 .tooltip-label {
   float: right;
 }
+.blocks-text {
+  text-shadow: white 0px 0px 2px;
+}
 
 .no-select {
   -webkit-touch-callout: none;
