@@ -93,8 +93,6 @@ module Graph {
       this.collectHeightWidth();
 
 
-      var fractionsOfBudget = [];
-
       var radiusForAll = d3.min([this.width, this.height]);
       this.radiusRawScale = d3.scale.linear()
         .domain([1e-6, this._valueMaxRaw])
@@ -320,28 +318,35 @@ module Graph {
     // *******************************************************************
     private radius = (d: any): number => {
       var value = this.value(d);
-      var rad;
+      // var area = value > 0 ? value : 0;
+      var area;
+      // var radius = Spending.areaToRadius(area);
+      // radius = value;
+      // console.log(value, radius);
       switch (this._mode) {
         case SpendingMode.Raw:
-          rad = Math.max(0, this.radiusRawScale(value));
+          area = this.radiusRawScale(value);
           break;
         case SpendingMode.GDP:
-          rad = Math.max(0, this.radiusGdpScale(value));
+          area = this.radiusGdpScale(value);
           break;
         case SpendingMode.Capita:
-          rad = Math.max(0, this.radiusCapitaScale(value));
+          area = this.radiusCapitaScale(value);
           break;
         case SpendingMode.Real:
-          rad = Math.max(0, this.radiusRealScale(value));
+          area = this.radiusRealScale(value);
           break;
         case SpendingMode.RealCapita:
-          rad = Math.max(0, this.radiusRealCapitaScale(value));
+          area = this.radiusRealCapitaScale(value);
           break;
       }
-      d.radius = rad;
+      // console.log(rad);
+      d.radius = Spending.areaToRadius(Math.max(0, area)) * 10;
+      // d.radius = Math.max(0, area);
       return d.radius;
     }
     
+
     /** returns the *100 percent */
     private deltaPercent = (d: any): number => {
       if (this.Year <= this.data.YearStart) return 0;
@@ -646,6 +651,10 @@ module Graph {
       return d.sp + '-' + d.fn + '-' + d.sb;
     }
 
+    private static areaToRadius(area: number) {
+      return area < 0 ? 0 : Math.sqrt(area / Math.PI);
+    }
+    
     private static pluckUniqueSuperFunctions = (dats: any[]): string[]=> {
       return R.pipe(R.pluck('sp'), R.uniq)(dats);
     }
