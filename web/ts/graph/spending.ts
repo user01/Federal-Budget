@@ -304,7 +304,7 @@ module Graph {
     }
     private legendText = (d, i) => {
       var size = this.superIndexFractionSize(i);
-      console.log(size);
+      // console.log(size);
       return (this._superfunctions[d] && size > 0.05 ? this._superfunctions[d] : '');
     };
     
