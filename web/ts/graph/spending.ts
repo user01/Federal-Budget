@@ -207,7 +207,7 @@ module Graph {
       legend.append("text")
         .attr("class", "blocks-text")
         .attr("x", this.width - 24)
-        .attr("y", 9)
+        .attr("y", this.legendTextY)
         .attr("dy", ".35em")
         .style("text-anchor", "end")
         .text(this.legendText);
@@ -277,7 +277,7 @@ module Graph {
 
       var blockText = this.d3GraphElement.selectAll(".blocks-text")
         .transition().ease('linear').duration(150 * delayFactor)
-        .attr("dy", ".35em")
+        .attr("y", this.legendTextY)
         .text(this.legendText)
         .attr("x", this.width - 24);
     }
@@ -306,6 +306,9 @@ module Graph {
       var size = this.superIndexFractionSize(i);
       // console.log(size);
       return (this._superfunctions[d] && size > 0.05 ? this._superfunctions[d] : '');
+    };
+    private legendTextY = (d, i) => {
+      return this.superFunctionsScale(this.superIndexFractionSize(i)) / 2;
     };
     
 
