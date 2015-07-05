@@ -95,6 +95,9 @@ rect.backdrop {
 .is-center {
   text-align: center;
 }
+.tooltip-label {
+  float: right;
+}
 
 .no-select {
   -webkit-touch-callout: none;

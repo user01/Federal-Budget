@@ -30,49 +30,25 @@
         </div>
       </div>
       
-      <div class="pure-g">
-        <div class="pure-u-1-24"></div>
-        <div class="pure-u-22-24">
-          <p>Click the Timeline above to move the chart to a different year.</p>
-        </div>
-        <div class="pure-u-1-24"></div>
-      </div>
       
-      <div class="pure-g">
-        <div class="pure-u-1-24"></div>
-        <div class="pure-u-22-24">
-          <div class="pure-g is-center bounded-control">
-            <div class="pure-u-1 pure-u-sm-8-24">
-              <a class="pure-button pure-button-primary" id="correction-raw">Nominal Dollars</a>
-            </div>
-            <div class="pure-u-1 pure-u-sm-8-24">
-              <a class="pure-button" id="correction-ofgdp">% of GDP</a>
-            </div>
-            <div class="pure-u-1 pure-u-sm-8-24">
-              <a class="pure-button" id="correction-percaptia">Nominal Dollars Per Capita</a>
+      <form class="pure-form pure-form-stacked">
+        <fieldset>
+          <legend>Click the above Timeline to move the chart to a different year.</legend>
+          <div class="pure-g">
+            <div class="pure-u-1">
+              <label for="mode">Adjust values according to:</label>
+              <select id="mode" class="pure-input-1">
+                <option>Nominal Dollars</option>
+                <option>Nominal Dollars Per Capita</option>
+                <option>% of GDP</option>
+                <option>Real Dollars</option>
+                <option>Real Dollars Per Capita</option>
+              </select>
             </div>
           </div>
-          <div class="pure-u-1-24"></div>
-        </div>
-      </div>
+        </fieldset>
+      </form>
       
-      <div class="pure-g">
-        <div class="pure-u-1-24"></div>
-        <div class="pure-u-22-24">
-          <div class="pure-g is-center bounded-control">
-            <div class="pure-u-1 pure-u-sm-8-24">
-              <a class="pure-button" id="correction-real">Real Dollars</a>
-            </div>
-            <div class="pure-u-1 pure-u-sm-8-24">
-              <a class="pure-button">--</a>
-            </div>
-            <div class="pure-u-1 pure-u-sm-8-24">
-              <a class="pure-button" id="correction-realpercaptia">Real Dollars Per Capita</a>
-            </div>
-          </div>
-          <div class="pure-u-1-24"></div>
-        </div>
-      </div>
       <div id="tooltip" class="hidden">
         <p>
           <span id="super"></span>
@@ -83,24 +59,25 @@
         <p>
           <span id="sub"></span>
         </p>
+        <hr/>
         <p>
-          <span id="value">100</span>
+          <span id="value">100</span> <span id="value-right" class="tooltip-label">GDP</span>
         </p>
         <p>
-          <span id="delta">0</span> vs previous year
-        </p>
+          <span id="delta">0</span> <span class="tooltip-label">vs previous year</span></p>
       </div>
-      
       <div class="pure-g">
         <div class="pure-u-1-24"></div>
         <div class="pure-u-22-24">
-          <p>Budget figures sourced from <a href="https://www.whitehouse.gov/omb/budget/Historicals">White House Office of Management and Budget</a>.</p>
-          <p>Consumer Price Index figures sourced from <a href="http://www.bls.gov/cpi/tables.htm">Bureasu of Labor Statistics</a>.</p>
-          <p>Population figures sourced from <a href="https://www.census.gov/popest/data/historical/">United States Census</a>.</p>
+          <p>Budget figures sourced from
+            <a href="https://www.whitehouse.gov/omb/budget/Historicals">White House Office of Management and Budget</a>.</p>
+          <p>Consumer Price Index figures sourced from
+            <a href="http://www.bls.gov/cpi/tables.htm">Bureasu of Labor Statistics</a>.</p>
+          <p>Population figures sourced from
+            <a href="https://www.census.gov/popest/data/historical/">United States Census</a>.</p>
         </div>
         <div class="pure-u-1-24"></div>
       </div>
-      
       <!-- end of central column -->
       <div class="pure-u-1 pure-u-md-2-24 pure-u-lg-1-5"></div>
     </div>

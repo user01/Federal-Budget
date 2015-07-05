@@ -565,6 +565,7 @@ module Graph {
         .text((d.fn != d.sb) ? d.sb : '');
 
       var valueField = this.hoverTooltip.select('#value');
+      var valueRightField = this.hoverTooltip.select('#value-right');
       var deltaField = this.hoverTooltip.select('#delta');
       var value = this.value(d);
       var Pd: number|string = Math.floor(this.deltaPercent(d) * 10) / 10;
@@ -574,22 +575,27 @@ module Graph {
 
       switch (this._mode) {
         case SpendingMode.Raw:
-          valueField.text(Spending.dollarsToDollarString(value) + ' Nominal Dollars');
+          valueField.text('$' + Spending.dollarsToDollarString(value));
+          valueRightField.text('Nominal Dollars')
           break;
         case SpendingMode.Real:
-          valueField.text(Spending.dollarsToDollarString(value) + ' Real 2014 Dollars');
+          valueField.text('$' + Spending.dollarsToDollarString(value));
+          valueRightField.text('Real 2014 Dollars')
           break;
         case SpendingMode.GDP:
           var oute = Math.floor(value * 10000) / 100;
-          valueField.text(oute + '% of US GDP');
+          valueField.text(oute + '%');
+          valueRightField.text('of US GDP')
           break;
         case SpendingMode.Capita:
           var oute = Math.floor(value);
-          valueField.text('$' + oute + ' / person - Nominal');
+          valueField.text('$' + oute + ' / person');
+          valueRightField.text('Nominal Dollars')
           break;
         case SpendingMode.RealCapita:
           var oute = Math.floor(value);
-          valueField.text('$' + oute + ' / person - Real 2014 Dollars');
+          valueField.text('$' + oute + ' / person');
+          valueRightField.text('Real 2014 Dollars')
           break;
         default:
           valueField.text('Unknown mode');

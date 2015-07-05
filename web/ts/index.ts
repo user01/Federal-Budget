@@ -11,38 +11,33 @@ var onReady = (): void => {
   var yearTo = document.getElementById('year-to');
 
 
-  var btns = {
-    raw: {
-      elm: document.getElementById('correction-raw'),
+  var yearHead = new Graph.YearHead('graph-timeline-header');
+  var mode = document.getElementById('mode');
+
+
+  var btns = [
+    {
+      mode: 'Nominal Dollars',
       enum: Graph.SpendingMode.Raw
     },
-    gdp: {
-      elm: document.getElementById('correction-ofgdp'),
+    {
+      mode: '% of GDP',
       enum: Graph.SpendingMode.GDP
     },
-    percap: {
-      elm: document.getElementById('correction-percaptia'),
+    {
+      mode: 'Nominal Dollars Per Capita',
       enum: Graph.SpendingMode.Capita
     },
-    real: {
-      elm: document.getElementById('correction-real'),
+    {
+      mode: 'Real Dollars',
       enum: Graph.SpendingMode.Real
     },
-    realpercap: {
-      elm: document.getElementById('correction-realpercaptia'),
+    {
+      mode: 'Real Dollars Per Capita',
       enum: Graph.SpendingMode.RealCapita
     }
-  };
-  var btnKeys = R.keys(btns);
-  var yearHead = new Graph.YearHead('graph-timeline-header');
+  ];
 
-  var clearButtons = () => {
-    R.forEach(function(btnKey) {
-      var btn = btns[btnKey].elm;
-      btn.classList.remove('pure-button-primary');
-      // btn.classList.add('button-secondary');
-    })(btnKeys);
-  }
 
   var newTargetYearHandler = (newYear): void => {
     // console.log('year!', newYear);
@@ -66,17 +61,15 @@ var onReady = (): void => {
       yearHead.newCurrentYear(year);
     });
 
-    R.forEach(function(btnKey) {
-      var btn = btns[btnKey].elm;
-      var enu = btns[btnKey].enum;
-      btn.onclick = () => {
-        clearButtons();
-        // btn.classList.remove('button-secondary');
-        btn.classList.add('pure-button-primary');
-        spending.Mode = enu;
-        spending.RenderNewState();
-      }
-    })(btnKeys);
+    mode.onchange = (evt: any): void => {
+      var selectedOption = evt.currentTarget.value;
+      // console.log(selectedOption);
+      var obj = R.find(R.propEq('mode', selectedOption))(btns);
+      if (!obj) return;
+      // console.log(obj.enum, Graph.SpendingMode.RealCapita);
+      spending.Mode = obj.enum;
+      spending.RenderNewState();
+    }
 
   });
   dataAll.Initialize();
