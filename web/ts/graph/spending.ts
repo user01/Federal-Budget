@@ -235,7 +235,7 @@ module Graph {
       this.collectHeightWidth();
       this.backdrop.attr("width", this.width)
         .attr("height", this.height);
-      this.force.size([this.width, this.height]);
+      this.force.size([this.width * 0.9, this.height]);
 
       this.resetRanges();
 
