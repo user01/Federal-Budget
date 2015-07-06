@@ -317,7 +317,9 @@ module Graph {
     private legendText = (d, i) => {
       var size = this.superIndexFractionSize(i);
       // console.log(size);
-      return (this._superfunctions[d] && size > 0.05 ? this._superfunctions[d] : '');
+      return (this._superfunctions[d] && size > 0.05 ?
+        this._superfunctions[d] + ' ' + Math.floor(size * 100) + '%'
+        : '');
     };
     private legendTextY = (d, i) => {
       return this.superFunctionsScale(this.superIndexFractionSize(i)) / 2;
