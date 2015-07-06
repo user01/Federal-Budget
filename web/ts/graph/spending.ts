@@ -93,26 +93,26 @@ module Graph {
       this.collectHeightWidth();
 
 
-      var radiusForAll = d3.min([this.width, this.height]);
+      var areaForAll = this.areaForGraph();
       this.radiusRawScale = d3.scale.linear()
         .domain([1e-6, this._valueMaxRaw])
-        .range([0, radiusForAll]);
+        .range([0, areaForAll]);
 
       this.radiusGdpScale = d3.scale.linear()
         .domain([1e-6, this._valueMaxGdp])
-        .range([0, radiusForAll]);
+        .range([0, areaForAll]);
 
       this.radiusCapitaScale = d3.scale.linear()
         .domain([1e-6, this._valueMaxCapita])
-        .range([0, radiusForAll]);
+        .range([0, areaForAll]);
 
       this.radiusRealScale = d3.scale.linear()
         .domain([1e-6, this._valueMaxReal])
-        .range([0, radiusForAll]);
+        .range([0, areaForAll]);
 
       this.radiusRealCapitaScale = d3.scale.linear()
         .domain([1e-6, this._valueMaxRealCapita])
-        .range([0, radiusForAll]);
+        .range([0, areaForAll]);
 
       this.superFunctionsScale = d3.scale.linear()
         .domain([0, 1])
@@ -214,18 +214,31 @@ module Graph {
       this.resize();
     }
 
+    /** Reset d3 Scales according to current DOM object size */
+    protected resetRanges(): void {
+      var areaForAll = this.areaForGraph();
+      this.radiusRawScale.range([0, areaForAll]);
+      this.radiusGdpScale.range([0, areaForAll]);
+      this.radiusCapitaScale.range([0, areaForAll]);
+      this.radiusRealScale.range([0, areaForAll]);
+      this.radiusRealCapitaScale.range([0, areaForAll]);
+      this.superFunctionsScale.range([0, this.height - 11]);
+    }
 
+    private areaForGraph(): number {
+      var radiusForAll = (d3.min([this.width, this.height]) * 0.8) / 2;
+      var areaForAll = Spending.radiusToArea(radiusForAll);
+      return areaForAll;
+    }
+    
     protected resize = (): void => {
       this.collectHeightWidth();
       this.backdrop.attr("width", this.width)
         .attr("height", this.height);
       this.force.size([this.width, this.height]);
 
-      var radiusForAll = d3.min([this.width, this.height]);
-      this.radiusRawScale.range([0, radiusForAll]); //reset ranges
-      this.superFunctionsScale
-        .range([0, this.height - 11]);
-      
+      this.resetRanges();
+
       this.elevationScale
         .range([this.height * 0.7, this.height * 0.5, this.height * 0.3])
       this.data.Sets.budget.DataSet = R.mapIndexed(this.setCyForObj)(this.data.Sets.budget.DataSet);
@@ -233,7 +246,7 @@ module Graph {
       this.RenderNewState(0);
     }
 
-    public RenderNewState = (delayFactor:number=1): void => {
+    public RenderNewState = (delayFactor: number = 1): void => {
       // console.log('Desired: ', this.YearDesired, ' at ', this.Year);
       if (this.YearDesired > this.Year) {
         this.Year++;
@@ -342,7 +355,7 @@ module Graph {
           break;
       }
       // console.log(rad);
-      d.radius = Spending.areaToRadius(Math.max(0, area)) * 10;
+      d.radius = Spending.areaToRadius(Math.max(0, area));
       // d.radius = Math.max(0, area);
       return d.radius;
     }
@@ -655,7 +668,11 @@ module Graph {
     private static areaToRadius(area: number) {
       return area < 0 ? 0 : Math.sqrt(area / Math.PI);
     }
-    
+
+    private static radiusToArea(radius: number) {
+      return Math.PI * radius * radius;
+    }
+
     private static pluckUniqueSuperFunctions = (dats: any[]): string[]=> {
       return R.pipe(R.pluck('sp'), R.uniq)(dats);
     }
