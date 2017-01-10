@@ -1,0 +1,137 @@
+
+/* Graphs Styling */
+.graph-wrapper {
+  height: 40vh;
+  padding: 0.2em 1em;
+  cursor: default;
+}
+#graph-main {
+  height: 100%;
+  width: 100%;
+}
+
+.graph-timeline-wrapper {
+  height: 3em;
+  padding: 0 1em 0 1em;
+  cursor: default;
+}
+.graph-timeline-wrapper svg {
+  height: 100%;
+  width: 100%;
+}
+
+/* SVG status */
+
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #555;
+  shape-rendering: crispEdges;
+}
+
+.axis text {
+  fill: #555;
+}
+
+.line {
+  fill: none;
+  stroke: #ef0d0c;
+  stroke-width: 0.1em;
+}
+.alive.area {
+  stroke: none;
+  fill: #5DA5DA;
+  fill-opacity: 0.75;
+}
+.current.area {
+  stroke: none;
+  fill: #FF0000;
+}
+rect.backdrop {
+  fill: none;
+  pointer-events: all;
+}
+.dot {
+  stroke-width: 2px;
+}
+
+
+#tooltip {
+  position: absolute;
+  width: 16em;
+  height: auto;
+  padding: 0.4em;
+  padding-left: 1.5em;
+  background-color: white;
+  -webkit-border-radius: 1em;
+  -moz-border-radius: 1em;
+  border-radius: 1em;
+  -webkit-box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.4);
+  -moz-box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.4);
+  box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.4);
+  pointer-events: none;
+}
+
+#tooltip.hidden {
+  display: none;
+}
+
+#tooltip p {
+  margin: 0;
+  font-family: sans-serif;
+  font-size: 1em;
+  line-height: 1.2em;
+}
+
+.bounded-control > div > a {
+  margin: 0.5em;
+}
+
+/* Utils */
+.name-title {
+  margin-top: 0.5em;
+  margin-bottom: 0.2em;
+}
+.is-center {
+  text-align: center;
+}
+.tooltip-label {
+  float: right;
+}
+.blocks-text {
+  text-shadow: white 0px 0px 2px;
+}
+
+.no-select {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+.button-success,
+.button-error,
+.button-warning,
+.button-secondary {
+  color: rgb(33, 24, 24);
+  border-radius: 4px;
+  text-shadow: 0 1px 1px rgba(0, 41, 168, 0.8);;
+}
+
+.button-success {
+  background: rgb(28, 184, 65); /* this is a green */
+}
+
+.button-error {
+  background: rgb(202, 60, 60); /* this is a maroon */
+}
+
+.button-warning {
+  background: rgb(223, 117, 20); /* this is an orange */
+}
+
+.button-secondary {
+  background: rgb(66, 184, 221); /* this is a light blue */
+}

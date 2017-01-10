@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="msapplication-tap-highlight" content="no" />
+  <meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1, maximum-scale=1">
+  <link rel="stylesheet" href="//yui.yahooapis.com/pure/0.6.0/pure-min.css">
+  <!--[if lte IE 8]>
+    <link rel="stylesheet" href="//yui.yahooapis.com/pure/0.6.0/grids-responsive-old-ie-min.css">
+  <![endif]-->
+  <!--[if gt IE 8]>
+    <!-->
+    <link rel="stylesheet" href="//yui.yahooapis.com/pure/0.6.0/grids-responsive-min.css">
+  <!--<![endif]-->
+  <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+  <link href='css/index.css' rel='stylesheet' type='text/css'>
+</head>
+<body class="no-select" id="swipe-control">
+  <div class="pure-g">
+    <div class="pure-u-1 pure-u-md-2-24 pure-u-lg-1-5"></div>
+    <div class="pure-u-1 pure-u-md-20-24 pure-u-lg-3-5">
+      <h1 class="name-title is-center">United States Federal Budget</h1>
+      <h2 class="name-title is-center" id="year-to">-</h2>
+      <div>
+        <div class="graph-wrapper">
+          <svg id="graph-main"></svg>
+        </div>
+        <div class="graph-timeline-wrapper">
+          <svg id="graph-timeline-header"></svg>
+        </div>
+      </div>
+      
+      
+      <form class="pure-form pure-form-stacked">
+        <fieldset>
+          <legend>Click the above Timeline to move the chart to a different year.</legend>
+          <div class="pure-g">
+            <div class="pure-u-1">
+              <label for="mode">Adjust values according to:</label>
+              <select id="mode" class="pure-input-1">
+                <option>Nominal Dollars</option>
+                <option>Nominal Dollars Per Capita</option>
+                <option>% of GDP</option>
+                <option>Real Dollars</option>
+                <option>Real Dollars Per Capita</option>
+              </select>
+            </div>
+          </div>
+        </fieldset>
+      </form>
+      
+      <div id="tooltip" class="hidden">
+        <p>
+          <span id="super"></span>
+        </p>
+        <p>
+          <strong id="function"></strong>
+        </p>
+        <p>
+          <span id="sub"></span>
+        </p>
+        <hr/>
+        <p>
+          <span id="value">100</span> <span id="value-right" class="tooltip-label">GDP</span>
+        </p>
+        <p>
+          <span id="delta">0</span> <span class="tooltip-label">vs previous year</span></p>
+      </div>
+      <div class="pure-g">
+        <div class="pure-u-1-24"></div>
+        <div class="pure-u-22-24">
+          <p>Budget figures sourced from
+            <a href="https://www.whitehouse.gov/omb/budget/Historicals">White House Office of Management and Budget</a>.</p>
+          <p>Consumer Price Index figures sourced from
+            <a href="http://www.bls.gov/cpi/tables.htm">Bureau of Labor Statistics</a>.</p>
+          <p>Population figures sourced from
+            <a href="https://www.census.gov/popest/data/historical/">United States Census</a>.</p>
+        </div>
+        <div class="pure-u-1-24"></div>
+      </div>
+      <!-- end of central column -->
+      <div class="pure-u-1 pure-u-md-2-24 pure-u-lg-1-5"></div>
+    </div>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/ramda/0.14.0/ramda.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js"></script>
+    <script src="js/index.js"></script>
+</body>
+
+</html>
